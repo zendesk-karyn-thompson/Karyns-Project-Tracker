@@ -335,6 +335,81 @@
             color: white;
         }
 
+        .category-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        .category-filter-btn {
+            background: white;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-filter-btn:hover {
+            background: #f7fafc;
+            border-color: #A1D78F;
+            color: #2D4C33;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(161,215,143,0.3);
+        }
+
+        .category-filter-btn.active {
+            background: #A1D78F;
+            color: #11110D;
+            border-color: #A1D78F;
+            font-weight: 600;
+        }
+
+        .category-section {
+            margin-bottom: 48px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #A1D78F;
+        }
+
+        .category-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2D4C33;
+        }
+
+        .category-count {
+            background: #A1D78F;
+            color: #203524;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f7fafc;
+            color: #4a5568;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
         .section {
             margin-bottom: 24px;
         }
@@ -951,11 +1026,21 @@
                 <button class="secondary" onclick="importData()">Import Data</button>
             </div>
 
-            <div class="projects-grid" id="projects-grid">
+            <div class="category-filters" id="category-filters">
+                <button class="category-filter-btn active" onclick="filterByCategory('all')">All Projects</button>
+                <button class="category-filter-btn" onclick="filterByCategory('lifecycle')">Lifecycle Growth</button>
+                <button class="category-filter-btn" onclick="filterByCategory('partner')">Partner & Tech Alliance</button>
+                <button class="category-filter-btn" onclick="filterByCategory('mql')">MQL & Onboarding</button>
+                <button class="category-filter-btn" onclick="filterByCategory('governance')">Governance & Growth</button>
+            </div>
+
+            <div id="projects-container">
+                <div class="projects-grid" id="projects-grid">
                 <div class="empty-state">
                     <h3>No projects yet</h3>
                     <p>Click "Add New Project" to get started</p>
                 </div>
+            </div>
             </div>
         </div>
 
@@ -1125,6 +1210,17 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="project-category">Category *</label>
+                    <select id="project-category" required>
+                        <option value="">Select a category</option>
+                        <option value="lifecycle">Lifecycle Growth: Pre-MQL and Cold lead rewarm</option>
+                        <option value="partner">Partner and Tech Alliance</option>
+                        <option value="mql">MQL, Onboarding, and customer expansion</option>
+                        <option value="governance">Governance and Growth</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="project-tldr">TLDR Summary (Optional)</label>
                     <textarea id="project-tldr" placeholder="A brief 1-2 sentence summary for the dashboard"></textarea>
                 </div>
@@ -1243,6 +1339,15 @@ Dashboard: https://..."></textarea>
         let currentProjectId = null;
         let editingProjectId = null;
         let currentView = 'dashboard';
+        let currentCategoryFilter = 'all';
+
+        // Category definitions
+        const categories = {
+            'lifecycle': 'Lifecycle Growth: Pre-MQL and Cold lead rewarm',
+            'partner': 'Partner and Tech Alliance',
+            'mql': 'MQL, Onboarding, and customer expansion',
+            'governance': 'Governance and Growth'
+        };
 
         // Initialize
         window.addEventListener('DOMContentLoaded', () => {
@@ -1265,47 +1370,133 @@ Dashboard: https://..."></textarea>
 
         // Render dashboard
         function renderDashboard() {
-            const grid = document.getElementById('projects-grid');
+            const container = document.getElementById('projects-container');
 
             if (projects.length === 0) {
-                grid.innerHTML = `
+                container.innerHTML = `
                     <div class="empty-state">
                         <h3>No projects yet</h3>
                         <p>Click "Add New Project" to get started</p>
                     </div>
                 `;
+                return;
+            }
+
+            if (currentCategoryFilter === 'all') {
+                renderByCategories(container);
             } else {
-                grid.innerHTML = projects.map(project => {
-                    const quickLinks = extractQuickLinks(project.links);
-                    return `
-                        <div class="project-card" onclick="showProjectDetail('${project.id}')">
-                            <div class="project-header">
-                                <div style="flex: 1;">
-                                    <div class="project-title">${project.name}</div>
-                                    <div class="badges">
-                                        <span class="badge status-${project.status}">${formatStatus(project.status)}</span>
-                                        <span class="badge priority-${project.priority}">${formatPriority(project.priority)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="project-tldr">
-                                ${project.tldr || project.executiveSummary || 'No summary provided'}
-                            </div>
-                            ${quickLinks.length > 0 ? `
-                                <div class="project-card-footer" onclick="event.stopPropagation()">
-                                    ${quickLinks.map(link => `
-                                        <a href="${link.url}" class="quick-link-badge" target="_blank" title="${link.text}">
-                                            🔗 ${link.text.substring(0, 20)}${link.text.length > 20 ? '...' : ''}
-                                        </a>
-                                    `).join('')}
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                }).join('');
+                renderFilteredProjects(container, currentCategoryFilter);
             }
 
             updatePortfolioSummary();
+        }
+
+        // Render projects grouped by categories
+        function renderByCategories(container) {
+            let html = '';
+
+            Object.keys(categories).forEach(categoryKey => {
+                const categoryProjects = projects.filter(p => p.category === categoryKey);
+
+                if (categoryProjects.length > 0) {
+                    html += `
+                        <div class="category-section">
+                            <div class="category-header">
+                                <h2>${categories[categoryKey]}</h2>
+                                <span class="category-count">${categoryProjects.length}</span>
+                            </div>
+                            <div class="projects-grid">
+                                ${renderProjectCards(categoryProjects)}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            // Show uncategorized projects
+            const uncategorized = projects.filter(p => !p.category);
+            if (uncategorized.length > 0) {
+                html += `
+                    <div class="category-section">
+                        <div class="category-header">
+                            <h2>Other Projects</h2>
+                            <span class="category-count">${uncategorized.length}</span>
+                        </div>
+                        <div class="projects-grid">
+                            ${renderProjectCards(uncategorized)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Render filtered projects
+        function renderFilteredProjects(container, categoryKey) {
+            const categoryProjects = projects.filter(p => p.category === categoryKey);
+
+            container.innerHTML = `
+                <div class="category-section">
+                    <div class="category-header">
+                        <h2>${categories[categoryKey]}</h2>
+                        <span class="category-count">${categoryProjects.length}</span>
+                    </div>
+                    <div class="projects-grid">
+                        ${categoryProjects.length > 0 ? renderProjectCards(categoryProjects) : `
+                            <div class="empty-state">
+                                <h3>No projects in this category</h3>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render project cards
+        function renderProjectCards(projectList) {
+            return projectList.map(project => {
+                const quickLinks = extractQuickLinks(project.links);
+                return `
+                    <div class="project-card" onclick="showProjectDetail('${project.id}')">
+                        ${project.category ? `<div class="category-badge">${categories[project.category]}</div>` : ''}
+                        <div class="project-header">
+                            <div style="flex: 1;">
+                                <div class="project-title">${project.name}</div>
+                                <div class="badges">
+                                    <span class="badge status-${project.status}">${formatStatus(project.status)}</span>
+                                    <span class="badge priority-${project.priority}">${formatPriority(project.priority)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="project-tldr">
+                            ${project.tldr || project.executiveSummary || 'No summary provided'}
+                        </div>
+                        ${quickLinks.length > 0 ? `
+                            <div class="project-card-footer" onclick="event.stopPropagation()">
+                                ${quickLinks.map(link => `
+                                    <a href="${link.url}" class="quick-link-badge" target="_blank" title="${link.text}">
+                                        🔗 ${link.text.substring(0, 20)}${link.text.length > 20 ? '...' : ''}
+                                    </a>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter by category
+        function filterByCategory(categoryKey) {
+            currentCategoryFilter = categoryKey;
+
+            // Update active button
+            document.querySelectorAll('.category-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderDashboard();
         }
 
         // Update portfolio summary
@@ -1725,6 +1916,7 @@ Dashboard: https://..."></textarea>
             document.getElementById('project-name').value = project.name;
             document.getElementById('project-status').value = project.status;
             document.getElementById('project-priority').value = project.priority;
+            document.getElementById('project-category').value = project.category || '';
             document.getElementById('project-tldr').value = project.tldr || '';
             document.getElementById('project-exec-summary').value = project.executiveSummary || '';
             document.getElementById('project-manager-snapshot').value = project.managerSnapshot || '';
@@ -1760,6 +1952,7 @@ Dashboard: https://..."></textarea>
                 name: document.getElementById('project-name').value,
                 status: document.getElementById('project-status').value,
                 priority: document.getElementById('project-priority').value,
+                category: document.getElementById('project-category').value,
                 tldr: document.getElementById('project-tldr').value,
                 executiveSummary: document.getElementById('project-exec-summary').value,
                 managerSnapshot: document.getElementById('project-manager-snapshot').value,
