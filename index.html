@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: #fafafa;
+            background: #F5F5F2;
             color: #11110D;
             line-height: 1.6;
             padding: 20px;
@@ -88,8 +88,8 @@
             margin-bottom: 4px;
         }
 
-        .summary-number.in-progress { color: #4facfe; }
-        .summary-number.completed { color: #10b981; }
+        .summary-number.in-progress { color: #A1D78F; }
+        .summary-number.completed { color: #2D4C33; }
         .summary-number.blocked { color: #ef4444; }
         .summary-number.total { color: #11110D; }
 
@@ -150,8 +150,13 @@
 
         .project-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(161,215,143,0.2), 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 24px rgba(161,215,143,0.3), 0 4px 8px rgba(0,0,0,0.1);
             border-color: #A1D78F;
+        }
+
+        .project-card.has-blocked:hover {
+            border-color: #ef4444;
+            box-shadow: 0 12px 24px rgba(239,68,68,0.2), 0 4px 8px rgba(0,0,0,0.1);
         }
 
         .project-card::before {
@@ -166,22 +171,22 @@
         }
 
         .project-card.lifecycle::before {
-            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            background: #2D4C33;
             opacity: 1;
         }
 
         .project-card.partner::before {
-            background: linear-gradient(180deg, #f093fb 0%, #f5576c 100%);
+            background: #203524;
             opacity: 1;
         }
 
         .project-card.mql::before {
-            background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+            background: #A1D78F;
             opacity: 1;
         }
 
         .project-card.governance::before {
-            background: linear-gradient(180deg, #fa709a 0%, #fee140 100%);
+            background: #D1F470;
             opacity: 1;
         }
 
@@ -231,17 +236,17 @@
         .status-not-started::before { content: "⏸️"; }
 
         .status-in-progress {
-            background: #4facfe;
-            color: white;
+            background: #A1D78F;
+            color: #203524;
             animation: pulse 2s ease-in-out infinite;
-            box-shadow: 0 2px 8px rgba(79,172,254,0.4);
+            box-shadow: 0 2px 8px rgba(161,215,143,0.4);
         }
         .status-in-progress::before { content: "▶️"; }
 
         .status-completed {
-            background: #10b981;
+            background: #2D4C33;
             color: white;
-            box-shadow: 0 2px 8px rgba(16,185,129,0.4);
+            box-shadow: 0 2px 8px rgba(45,76,51,0.4);
         }
         .status-completed::before { content: "✅"; }
 
@@ -266,16 +271,16 @@
         .priority-high::before { content: "🔥"; }
 
         .priority-medium {
-            background: #ffa726;
-            color: white;
-            box-shadow: 0 2px 8px rgba(255,167,38,0.4);
+            background: #FEEB7E;
+            color: #11110D;
+            box-shadow: 0 2px 8px rgba(254,235,126,0.4);
         }
         .priority-medium::before { content: "⚡"; }
 
         .priority-low {
-            background: #78909c;
-            color: white;
-            box-shadow: 0 2px 8px rgba(120,144,156,0.3);
+            background: #D1F470;
+            color: #203524;
+            box-shadow: 0 2px 8px rgba(209,244,112,0.3);
         }
         .priority-low::before { content: "📌"; }
 
@@ -430,13 +435,13 @@
         }
 
         .project-progress-indicator.in-progress {
-            border-left-color: #4facfe;
-            background: #f0f9ff;
+            border-left-color: #A1D78F;
+            background: #f0fdf4;
         }
 
         .project-progress-indicator.completed {
-            border-left-color: #10b981;
-            background: #f0fdf4;
+            border-left-color: #2D4C33;
+            background: #ecfdf5;
         }
 
         .project-progress-indicator.blocked {
@@ -517,19 +522,19 @@
         }
 
         .category-header.lifecycle {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2D4C33 0%, #A1D78F 100%);
         }
 
         .category-header.partner {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #203524 0%, #2D4C33 100%);
         }
 
         .category-header.mql {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #A1D78F 0%, #D1F470 100%);
         }
 
         .category-header.governance {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            background: linear-gradient(135deg, #2D4C33 0%, #D1F470 100%);
         }
 
         .category-header h2 {
@@ -562,23 +567,23 @@
         }
 
         .category-badge.lifecycle {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #2D4C33;
             color: white;
         }
 
         .category-badge.partner {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: #203524;
             color: white;
         }
 
         .category-badge.mql {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
+            background: #A1D78F;
+            color: #203524;
         }
 
         .category-badge.governance {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            color: #11110D;
+            background: #D1F470;
+            color: #203524;
         }
 
         .section {
