@@ -259,6 +259,82 @@
             font-weight: 500;
         }
 
+        .key-links-section {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+            border: 2px solid #A1D78F;
+        }
+
+        .key-links-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2D4C33;
+            margin-bottom: 16px;
+        }
+
+        .key-links-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .key-link-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .key-link-item:hover {
+            background: #D1F470;
+            transform: translateX(4px);
+        }
+
+        .key-link-item a {
+            color: #2D4C33;
+            text-decoration: none;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .key-link-icon {
+            color: #A1D78F;
+            font-size: 18px;
+        }
+
+        .project-card-footer {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quick-link-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: #A1D78F;
+            color: #203524;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .quick-link-badge:hover {
+            background: #2D4C33;
+            color: white;
+        }
+
         .section {
             margin-bottom: 24px;
         }
@@ -904,6 +980,11 @@
                     <p id="detail-manager-snapshot"></p>
                 </div>
 
+                <div class="key-links-section" id="key-links-section" style="display: none;">
+                    <h3>🔗 Key Links</h3>
+                    <div id="key-links-content"></div>
+                </div>
+
                 <div class="value-impact-section">
                     <h3>💼 Value & Impact Summary</h3>
                     <div id="value-impact-content"></div>
@@ -1080,7 +1161,10 @@
 
                 <div class="form-group">
                     <label for="project-links">Links & References</label>
-                    <textarea id="project-links" placeholder="Docs, Slack threads, briefs, dashboards"></textarea>
+                    <textarea id="project-links" placeholder="Add links one per line, optionally with labels:
+Asana Project: https://...
+Google Doc: https://...
+Dashboard: https://..."></textarea>
                 </div>
 
                 <div class="form-group">
@@ -1191,22 +1275,34 @@
                     </div>
                 `;
             } else {
-                grid.innerHTML = projects.map(project => `
-                    <div class="project-card" onclick="showProjectDetail('${project.id}')">
-                        <div class="project-header">
-                            <div style="flex: 1;">
-                                <div class="project-title">${project.name}</div>
-                                <div class="badges">
-                                    <span class="badge status-${project.status}">${formatStatus(project.status)}</span>
-                                    <span class="badge priority-${project.priority}">${formatPriority(project.priority)}</span>
+                grid.innerHTML = projects.map(project => {
+                    const quickLinks = extractQuickLinks(project.links);
+                    return `
+                        <div class="project-card" onclick="showProjectDetail('${project.id}')">
+                            <div class="project-header">
+                                <div style="flex: 1;">
+                                    <div class="project-title">${project.name}</div>
+                                    <div class="badges">
+                                        <span class="badge status-${project.status}">${formatStatus(project.status)}</span>
+                                        <span class="badge priority-${project.priority}">${formatPriority(project.priority)}</span>
+                                    </div>
                                 </div>
                             </div>
+                            <div class="project-tldr">
+                                ${project.tldr || project.executiveSummary || 'No summary provided'}
+                            </div>
+                            ${quickLinks.length > 0 ? `
+                                <div class="project-card-footer" onclick="event.stopPropagation()">
+                                    ${quickLinks.map(link => `
+                                        <a href="${link.url}" class="quick-link-badge" target="_blank" title="${link.text}">
+                                            🔗 ${link.text.substring(0, 20)}${link.text.length > 20 ? '...' : ''}
+                                        </a>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
                         </div>
-                        <div class="project-tldr">
-                            ${project.tldr || project.executiveSummary || 'No summary provided'}
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
 
             updatePortfolioSummary();
@@ -1318,6 +1414,8 @@
             document.getElementById('section-links').innerHTML = formatLinks(project.links);
             document.getElementById('section-okr').textContent = project.okr || 'No OKR alignment specified';
             document.getElementById('section-skills').innerHTML = formatSkills(project.skills);
+
+            renderKeyLinks(project);
 
             renderValueImpact(project);
             renderProjectStats(project);
@@ -1827,6 +1925,79 @@
         function formatSkills(skills) {
             if (!skills || skills.length === 0) return 'No skills specified';
             return skills.map(skill => `<span class="badge" style="background: #D1F470; color: #203524;">${skill}</span>`).join(' ');
+        }
+
+        // Extract quick links
+        function extractQuickLinks(linksText) {
+            if (!linksText) return [];
+
+            const urlRegex = /https?:\/\/[^\s]+/g;
+            const urls = linksText.match(urlRegex) || [];
+
+            return urls.slice(0, 3).map(url => {
+                // Try to find text before the URL
+                const lines = linksText.split('\n');
+                for (let line of lines) {
+                    if (line.includes(url)) {
+                        const text = line.replace(url, '').trim();
+                        return {
+                            url: url,
+                            text: text || url
+                        };
+                    }
+                }
+                return { url: url, text: url };
+            });
+        }
+
+        // Render key links section
+        function renderKeyLinks(project) {
+            const keyLinksSection = document.getElementById('key-links-section');
+            const keyLinksContent = document.getElementById('key-links-content');
+
+            if (!project.links || project.links.trim() === '') {
+                keyLinksSection.style.display = 'none';
+                return;
+            }
+
+            const urlRegex = /https?:\/\/[^\s]+/g;
+            const urls = project.links.match(urlRegex) || [];
+
+            if (urls.length === 0) {
+                keyLinksSection.style.display = 'none';
+                return;
+            }
+
+            keyLinksSection.style.display = 'block';
+
+            // Parse links with labels
+            const lines = project.links.split('\n').filter(line => line.trim());
+            let linksHtml = '';
+
+            lines.forEach(line => {
+                const urlMatch = line.match(urlRegex);
+                if (urlMatch) {
+                    const url = urlMatch[0];
+                    let label = line.replace(url, '').trim();
+
+                    // Clean up common prefixes
+                    label = label.replace(/^[-:•]\s*/, '').trim();
+
+                    if (!label || label === '') {
+                        // Try to extract from URL
+                        label = url.split('/').filter(p => p).pop() || url;
+                    }
+
+                    linksHtml += `
+                        <div class="key-link-item">
+                            <span class="key-link-icon">🔗</span>
+                            <a href="${url}" target="_blank">${label}</a>
+                        </div>
+                    `;
+                }
+            });
+
+            keyLinksContent.innerHTML = linksHtml || '<p style="color: #718096;">No links available</p>';
         }
     </script>
 </body>
