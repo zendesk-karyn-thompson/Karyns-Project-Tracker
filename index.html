@@ -158,14 +158,32 @@
             left: 0;
             width: 6px;
             height: 100%;
-            background: #A1D78F;
             border-radius: 16px 0 0 16px;
-            opacity: 0;
             transition: opacity 0.3s;
         }
 
-        .project-card:hover::before {
+        .project-card.lifecycle::before {
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
             opacity: 1;
+        }
+
+        .project-card.partner::before {
+            background: linear-gradient(180deg, #f093fb 0%, #f5576c 100%);
+            opacity: 1;
+        }
+
+        .project-card.mql::before {
+            background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+            opacity: 1;
+        }
+
+        .project-card.governance::before {
+            background: linear-gradient(180deg, #fa709a 0%, #fee140 100%);
+            opacity: 1;
+        }
+
+        .project-card:hover::before {
+            width: 8px;
         }
 
         .project-header {
@@ -210,21 +228,24 @@
         .status-not-started::before { content: "⏸️"; }
 
         .status-in-progress {
-            background: #D1F470;
-            color: #203524;
+            background: #4facfe;
+            color: white;
             animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 2px 8px rgba(79,172,254,0.4);
         }
         .status-in-progress::before { content: "▶️"; }
 
         .status-completed {
-            background: #A1D78F;
-            color: #203524;
+            background: #10b981;
+            color: white;
+            box-shadow: 0 2px 8px rgba(16,185,129,0.4);
         }
         .status-completed::before { content: "✅"; }
 
         .status-blocked {
-            background: #fed7d7;
-            color: #742a2a;
+            background: #ef4444;
+            color: white;
+            box-shadow: 0 2px 8px rgba(239,68,68,0.4);
         }
         .status-blocked::before { content: "🚫"; }
 
@@ -234,21 +255,24 @@
         }
 
         .priority-high {
-            background: #fed7d7;
-            color: #742a2a;
-            border: 2px solid #fc8181;
+            background: #ff6b6b;
+            color: white;
+            border: 2px solid #ff5252;
+            box-shadow: 0 2px 8px rgba(255,107,107,0.4);
         }
         .priority-high::before { content: "🔥"; }
 
         .priority-medium {
-            background: #FEEB7E;
-            color: #11110D;
+            background: #ffa726;
+            color: white;
+            box-shadow: 0 2px 8px rgba(255,167,38,0.4);
         }
         .priority-medium::before { content: "⚡"; }
 
         .priority-low {
-            background: #e2e8f0;
-            color: #4a5568;
+            background: #78909c;
+            color: white;
+            box-shadow: 0 2px 8px rgba(120,144,156,0.3);
         }
         .priority-low::before { content: "📌"; }
 
@@ -385,10 +409,59 @@
         .project-card-footer {
             margin-top: 16px;
             padding-top: 16px;
-            border-top: 1px solid #e2e8f0;
+            border-top: 2px solid #f0f0f0;
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
+        }
+
+        .project-progress-indicator {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .progress-circle.in-progress {
+            background: #4facfe;
+            color: white;
+        }
+
+        .progress-circle.completed {
+            background: #10b981;
+            color: white;
+        }
+
+        .progress-circle.blocked {
+            background: #ef4444;
+            color: white;
+        }
+
+        .progress-circle.not-started {
+            background: #e2e8f0;
+            color: #64748b;
+        }
+
+        .progress-text {
+            flex: 1;
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 600;
         }
 
         .quick-link-badge {
@@ -454,9 +527,24 @@
             gap: 16px;
             margin-bottom: 28px;
             padding: 20px 24px;
-            background: linear-gradient(135deg, #2D4C33 0%, #A1D78F 100%);
             border-radius: 12px;
             color: white;
+        }
+
+        .category-header.lifecycle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .category-header.partner {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .category-header.mql {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .category-header.governance {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         }
 
         .category-header h2 {
@@ -479,15 +567,33 @@
         .category-badge {
             display: inline-block;
             padding: 6px 12px;
-            background: linear-gradient(135deg, #A1D78F 0%, #D1F470 100%);
-            color: #203524;
             border-radius: 8px;
             font-size: 10px;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 12px;
-            box-shadow: 0 2px 4px rgba(161,215,143,0.3);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .category-badge.lifecycle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .category-badge.partner {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .category-badge.mql {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .category-badge.governance {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: #11110D;
         }
 
         .section {
@@ -1477,6 +1583,8 @@ Dashboard: https://..."></textarea>
                 renderFilteredProjects(container, currentCategoryFilter);
             }
 
+            addCategoryClasses();
+
             updatePortfolioSummary();
         }
 
@@ -1490,8 +1598,8 @@ Dashboard: https://..."></textarea>
                 if (categoryProjects.length > 0) {
                     html += `
                         <div class="category-section">
-                            <div class="category-header">
-                                <h2>${categories[categoryKey]}</h2>
+                            <div class="category-header ${categoryKey}">
+                                <h2>${getCategoryIcon(categoryKey)} ${categories[categoryKey]}</h2>
                                 <span class="category-count">${categoryProjects.length}</span>
                             </div>
                             <div class="projects-grid">
@@ -1521,14 +1629,38 @@ Dashboard: https://..."></textarea>
             container.innerHTML = html;
         }
 
+        // Get category icon
+        function getCategoryIcon(categoryKey) {
+            const icons = {
+                'lifecycle': '🚀',
+                'partner': '🤝',
+                'mql': '📈',
+                'governance': '⚙️'
+            };
+            return icons[categoryKey] || '📁';
+        }
+
+        // Add category classes after render
+        function addCategoryClasses() {
+            // This ensures category headers get their color classes
+            document.querySelectorAll('.category-header').forEach(header => {
+                const categoryKey = Object.keys(categories).find(key =>
+                    header.querySelector('h2').textContent.includes(categories[key])
+                );
+                if (categoryKey) {
+                    header.classList.add(categoryKey);
+                }
+            });
+        }
+
         // Render filtered projects
         function renderFilteredProjects(container, categoryKey) {
             const categoryProjects = projects.filter(p => p.category === categoryKey);
 
             container.innerHTML = `
                 <div class="category-section">
-                    <div class="category-header">
-                        <h2>${categories[categoryKey]}</h2>
+                    <div class="category-header ${categoryKey}">
+                        <h2>${getCategoryIcon(categoryKey)} ${categories[categoryKey]}</h2>
                         <span class="category-count">${categoryProjects.length}</span>
                     </div>
                     <div class="projects-grid">
@@ -1546,9 +1678,12 @@ Dashboard: https://..."></textarea>
         function renderProjectCards(projectList) {
             return projectList.map(project => {
                 const quickLinks = extractQuickLinks(project.links);
+                const statusIcon = getStatusIcon(project.status);
+                const progressText = getProgressText(project);
+
                 return `
-                    <div class="project-card" onclick="showProjectDetail('${project.id}')">
-                        ${project.category ? `<div class="category-badge">${categories[project.category]}</div>` : ''}
+                    <div class="project-card ${project.category || ''}" onclick="showProjectDetail('${project.id}')">
+                        ${project.category ? `<div class="category-badge ${project.category}">${categories[project.category]}</div>` : ''}
                         <div class="project-header">
                             <div style="flex: 1;">
                                 <div class="project-title">${project.name}</div>
@@ -1560,6 +1695,10 @@ Dashboard: https://..."></textarea>
                         </div>
                         <div class="project-tldr">
                             ${project.tldr || project.executiveSummary || 'No summary provided'}
+                        </div>
+                        <div class="project-progress-indicator">
+                            <div class="progress-circle ${project.status}">${statusIcon}</div>
+                            <div class="progress-text">${progressText}</div>
                         </div>
                         ${quickLinks.length > 0 ? `
                             <div class="project-card-footer" onclick="event.stopPropagation()">
@@ -1573,6 +1712,34 @@ Dashboard: https://..."></textarea>
                     </div>
                 `;
             }).join('');
+        }
+
+        // Get status icon
+        function getStatusIcon(status) {
+            const icons = {
+                'in-progress': '▶️',
+                'completed': '✅',
+                'blocked': '🚫',
+                'not-started': '⏸️'
+            };
+            return icons[status] || '📌';
+        }
+
+        // Get progress text
+        function getProgressText(project) {
+            const updateCount = project.history ? project.history.length : 0;
+            const daysActive = project.createdAt ?
+                Math.floor((new Date() - new Date(project.createdAt)) / (1000 * 60 * 60 * 24)) : 0;
+
+            if (project.status === 'completed') {
+                return `Completed • ${updateCount} updates`;
+            } else if (project.status === 'blocked') {
+                return `Blocked • Needs attention`;
+            } else if (project.status === 'in-progress') {
+                return `Active ${daysActive}d • ${updateCount} updates`;
+            } else {
+                return `Not started • ${updateCount} updates`;
+            }
         }
 
         // Filter by category
