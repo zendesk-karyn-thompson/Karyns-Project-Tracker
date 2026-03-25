@@ -60,7 +60,7 @@
 
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 16px;
         }
 
@@ -89,6 +89,7 @@
         }
 
         .summary-number.in-progress { color: #A1D78F; }
+        .summary-number.ready-to-launch { color: #FEEB7E; }
         .summary-number.completed { color: #2D4C33; }
         .summary-number.blocked { color: #ef4444; }
         .summary-number.total { color: #11110D; }
@@ -242,6 +243,14 @@
             box-shadow: 0 2px 8px rgba(161,215,143,0.4);
         }
         .status-in-progress::before { content: "▶️"; }
+
+        .status-ready-to-launch {
+            background: #FEEB7E;
+            color: #11110D;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 2px 8px rgba(254,235,126,0.5);
+        }
+        .status-ready-to-launch::before { content: "🚀"; }
 
         .status-completed {
             background: #2D4C33;
@@ -437,6 +446,11 @@
         .project-progress-indicator.in-progress {
             border-left-color: #A1D78F;
             background: #f0fdf4;
+        }
+
+        .project-progress-indicator.ready-to-launch {
+            border-left-color: #FEEB7E;
+            background: #fffef0;
         }
 
         .project-progress-indicator.completed {
@@ -1130,6 +1144,10 @@
                         <div class="summary-number in-progress" id="in-progress-count">0</div>
                     </div>
                     <div class="summary-card">
+                        <h3>🚀 Ready to Launch</h3>
+                        <div class="summary-number ready-to-launch" id="ready-to-launch-count">0</div>
+                    </div>
+                    <div class="summary-card">
                         <h3>✅ Completed</h3>
                         <div class="summary-number completed" id="completed-count">0</div>
                     </div>
@@ -1316,6 +1334,7 @@
                     <select id="project-status" required>
                         <option value="not-started">Not Started</option>
                         <option value="in-progress" selected>In Progress</option>
+                        <option value="ready-to-launch">Ready to Launch</option>
                         <option value="completed">Completed</option>
                         <option value="blocked">Blocked</option>
                     </select>
@@ -1643,6 +1662,7 @@ Dashboard: https://..."></textarea>
         function getStatusIcon(status) {
             const icons = {
                 'in-progress': '▶️',
+                'ready-to-launch': '🚀',
                 'completed': '✅',
                 'blocked': '🚫',
                 'not-started': '⏸️'
@@ -1660,6 +1680,8 @@ Dashboard: https://..."></textarea>
                 return `Completed • ${updateCount} updates`;
             } else if (project.status === 'blocked') {
                 return `Blocked • Needs attention`;
+            } else if (project.status === 'ready-to-launch') {
+                return `Ready to launch • ${updateCount} updates`;
             } else if (project.status === 'in-progress') {
                 return `Active ${daysActive}d • ${updateCount} updates`;
             } else {
@@ -1684,11 +1706,13 @@ Dashboard: https://..."></textarea>
         function updatePortfolioSummary() {
             const total = projects.length;
             const inProgress = projects.filter(p => p.status === 'in-progress').length;
+            const readyToLaunch = projects.filter(p => p.status === 'ready-to-launch').length;
             const completed = projects.filter(p => p.status === 'completed').length;
             const blocked = projects.filter(p => p.status === 'blocked').length;
 
             document.getElementById('total-count').textContent = total;
             document.getElementById('in-progress-count').textContent = inProgress;
+            document.getElementById('ready-to-launch-count').textContent = readyToLaunch;
             document.getElementById('completed-count').textContent = completed;
             document.getElementById('blocked-count').textContent = blocked;
         }
