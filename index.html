@@ -615,6 +615,201 @@
             letter-spacing: 0.5px;
         }
 
+        .main-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0;
+        }
+
+        .nav-button {
+            background: transparent;
+            color: #718096;
+            border: none;
+            border-bottom: 3px solid transparent;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 0;
+            margin-bottom: -2px;
+        }
+
+        .nav-button:hover {
+            color: #2D4C33;
+            background: transparent;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .nav-button.active {
+            color: #2D4C33;
+            border-bottom-color: #A1D78F;
+            font-weight: 600;
+        }
+
+        .archive-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 24px;
+            margin-bottom: 32px;
+            padding: 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .archive-stats {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .archive-stat {
+            text-align: center;
+        }
+
+        .archive-stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2D4C33;
+        }
+
+        .archive-stat-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .archive-timeline {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .archive-timeline-item {
+            position: relative;
+            padding-left: 48px;
+            padding-bottom: 32px;
+            border-left: 3px solid #A1D78F;
+        }
+
+        .archive-timeline-item:last-child {
+            border-left-color: transparent;
+            padding-bottom: 0;
+        }
+
+        .archive-timeline-dot {
+            position: absolute;
+            left: -8px;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            background: #A1D78F;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #A1D78F;
+        }
+
+        .archive-timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .archive-timeline-date {
+            font-weight: 600;
+            color: #2D4C33;
+            font-size: 16px;
+        }
+
+        .archive-timeline-project {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #D1F470;
+            color: #203524;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .archive-timeline-content {
+            color: #4a5568;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .archive-month-separator {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 40px 0 32px 0;
+        }
+
+        .archive-month-separator h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2D4C33;
+            white-space: nowrap;
+        }
+
+        .archive-month-separator hr {
+            flex: 1;
+            border: none;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .detailed-history-section {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 3px solid #e2e8f0;
+        }
+
+        .history-item-detailed {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border-left: 4px solid #A1D78F;
+            transition: all 0.2s;
+        }
+
+        .history-item-detailed:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateX(4px);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .history-item-date {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2D4C33;
+        }
+
+        .history-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .history-item-actions button {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
         @media (max-width: 768px) {
             .projects-grid {
                 grid-template-columns: 1fr;
@@ -632,6 +827,11 @@
 </head>
 <body>
     <div class="container">
+        <nav class="main-nav">
+            <button class="nav-button active" onclick="switchView('dashboard')">Dashboard</button>
+            <button class="nav-button" onclick="switchView('history-archive')">History Archive</button>
+        </nav>
+
         <div id="dashboard-view">
             <header>
                 <h1>Project Portfolio Tracker</h1>
@@ -767,16 +967,44 @@
 
                 <div class="project-stats" id="project-stats"></div>
 
-                <div class="history-section">
-                    <h2 style="margin-bottom: 12px;">Historical Updates Archive</h2>
-                    <p style="color: #718096; margin-bottom: 24px; font-size: 14px;">Complete timeline of all project updates and milestones</p>
-                    <button onclick="openUpdateModal()" style="margin-bottom: 24px;">+ Add Update</button>
-                    <div class="timeline-view" id="history-entries"></div>
+                <div class="detailed-history-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <div>
+                            <h2 style="margin-bottom: 8px;">Historical Updates Archive</h2>
+                            <p style="color: #718096; font-size: 14px;">Complete timeline of all updates and milestones for this project</p>
+                        </div>
+                        <button onclick="openUpdateModal()">+ Add Update</button>
+                    </div>
+                    <div id="history-entries"></div>
                 </div>
 
                 <div class="form-actions">
                     <button onclick="openEditModal()">Edit Project</button>
                     <button class="secondary" onclick="deleteProject()">Delete Project</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="history-archive-view" class="hidden">
+            <header>
+                <h1>History Archive</h1>
+                <p class="subtitle">Complete timeline of all project updates and milestones</p>
+            </header>
+
+            <div class="archive-controls">
+                <div class="form-group" style="max-width: 400px;">
+                    <label for="filter-project">Filter by Project</label>
+                    <select id="filter-project" onchange="filterHistoryArchive()">
+                        <option value="all">All Projects</option>
+                    </select>
+                </div>
+                <div class="archive-stats" id="archive-stats"></div>
+            </div>
+
+            <div class="archive-timeline" id="archive-timeline">
+                <div class="empty-state">
+                    <h3>No updates yet</h3>
+                    <p>Start adding updates to your projects to build your historical archive</p>
                 </div>
             </div>
         </div>
@@ -930,6 +1158,7 @@
         let projects = [];
         let currentProjectId = null;
         let editingProjectId = null;
+        let currentView = 'dashboard';
 
         // Initialize
         window.addEventListener('DOMContentLoaded', () => {
@@ -1071,8 +1300,7 @@
 
             if (!project) return;
 
-            document.getElementById('dashboard-view').classList.add('hidden');
-            document.getElementById('detail-view').classList.remove('hidden');
+            switchView('detail');
 
             document.getElementById('detail-title').textContent = project.name;
             document.getElementById('detail-badges').innerHTML = `
@@ -1169,19 +1397,52 @@
             const historyDiv = document.getElementById('history-entries');
 
             if (!project.history || project.history.length === 0) {
-                historyDiv.innerHTML = '<p style="color: #a0aec0;">No updates yet. Click "Add Update" to start building your historical archive.</p>';
+                historyDiv.innerHTML = '<p style="color: #a0aec0; text-align: center; padding: 40px;">No updates yet. Click "Add Update" to start building your historical archive.</p>';
                 return;
             }
 
             historyDiv.innerHTML = project.history
                 .sort((a, b) => new Date(b.date) - new Date(a.date))
                 .map((entry, index) => `
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-date">${formatDate(entry.date)}</div>
+                    <div class="history-item-detailed">
+                        <div class="history-item-header">
+                            <div class="history-item-date">${formatDate(entry.date)}</div>
+                            <div class="history-item-actions">
+                                <button class="secondary" onclick="editUpdate('${entry.id}')" style="font-size: 12px;">Edit</button>
+                                <button class="secondary" onclick="deleteUpdate('${entry.id}')" style="font-size: 12px;">Delete</button>
+                            </div>
+                        </div>
                         <div class="timeline-content">${entry.content}</div>
                     </div>
                 `).join('');
+        }
+
+        // Edit update
+        function editUpdate(updateId) {
+            const project = projects.find(p => p.id === currentProjectId);
+            if (!project) return;
+
+            const update = project.history.find(u => u.id === updateId);
+            if (!update) return;
+
+            document.getElementById('update-date').value = update.date;
+            document.getElementById('update-content').value = update.content;
+            document.getElementById('update-form').dataset.editingId = updateId;
+            document.getElementById('update-modal').classList.add('active');
+        }
+
+        // Delete update
+        function deleteUpdate(updateId) {
+            if (!confirm('Are you sure you want to delete this update? This cannot be undone.')) {
+                return;
+            }
+
+            const project = projects.find(p => p.id === currentProjectId);
+            if (!project) return;
+
+            project.history = project.history.filter(u => u.id !== updateId);
+            saveProjects();
+            renderHistory(project);
         }
 
         // Toggle history entry
@@ -1191,9 +1452,153 @@
 
         // Show dashboard
         function showDashboard() {
-            document.getElementById('dashboard-view').classList.remove('hidden');
-            document.getElementById('detail-view').classList.add('hidden');
+            switchView('dashboard');
             currentProjectId = null;
+        }
+
+        // Switch view
+        function switchView(view) {
+            currentView = view;
+
+            // Hide all views
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('detail-view').classList.add('hidden');
+            document.getElementById('history-archive-view').classList.add('hidden');
+
+            // Update nav buttons
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected view
+            if (view === 'dashboard') {
+                document.getElementById('dashboard-view').classList.remove('hidden');
+                document.querySelectorAll('.nav-button')[0].classList.add('active');
+            } else if (view === 'history-archive') {
+                document.getElementById('history-archive-view').classList.remove('hidden');
+                document.querySelectorAll('.nav-button')[1].classList.add('active');
+                renderHistoryArchive();
+            } else if (view === 'detail') {
+                document.getElementById('detail-view').classList.remove('hidden');
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        // Render history archive
+        function renderHistoryArchive() {
+            const filterSelect = document.getElementById('filter-project');
+            const statsDiv = document.getElementById('archive-stats');
+            const timelineDiv = document.getElementById('archive-timeline');
+
+            // Populate project filter
+            filterSelect.innerHTML = '<option value="all">All Projects</option>';
+            projects.forEach(project => {
+                filterSelect.innerHTML += `<option value="${project.id}">${project.name}</option>`;
+            });
+
+            // Collect all updates
+            let allUpdates = [];
+            projects.forEach(project => {
+                if (project.history && project.history.length > 0) {
+                    project.history.forEach(update => {
+                        allUpdates.push({
+                            ...update,
+                            projectId: project.id,
+                            projectName: project.name,
+                            projectStatus: project.status
+                        });
+                    });
+                }
+            });
+
+            // Sort by date (newest first)
+            allUpdates.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Calculate stats
+            const totalUpdates = allUpdates.length;
+            const projectsWithUpdates = new Set(allUpdates.map(u => u.projectId)).size;
+            const thisMonth = allUpdates.filter(u => {
+                const updateDate = new Date(u.date);
+                const now = new Date();
+                return updateDate.getMonth() === now.getMonth() &&
+                       updateDate.getFullYear() === now.getFullYear();
+            }).length;
+
+            // Render stats
+            statsDiv.innerHTML = `
+                <div class="archive-stat">
+                    <div class="archive-stat-number">${totalUpdates}</div>
+                    <div class="archive-stat-label">Total Updates</div>
+                </div>
+                <div class="archive-stat">
+                    <div class="archive-stat-number">${projectsWithUpdates}</div>
+                    <div class="archive-stat-label">Active Projects</div>
+                </div>
+                <div class="archive-stat">
+                    <div class="archive-stat-number">${thisMonth}</div>
+                    <div class="archive-stat-label">This Month</div>
+                </div>
+            `;
+
+            // Render timeline
+            if (allUpdates.length === 0) {
+                timelineDiv.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No updates yet</h3>
+                        <p>Start adding updates to your projects to build your historical archive</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            let currentMonth = '';
+
+            allUpdates.forEach((update, index) => {
+                const updateDate = new Date(update.date);
+                const monthYear = updateDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+                // Add month separator
+                if (monthYear !== currentMonth) {
+                    currentMonth = monthYear;
+                    html += `
+                        <div class="archive-month-separator">
+                            <h3>${monthYear}</h3>
+                            <hr>
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="archive-timeline-item" data-project-id="${update.projectId}">
+                        <div class="archive-timeline-dot"></div>
+                        <div class="archive-timeline-header">
+                            <div class="archive-timeline-date">${formatDate(update.date)}</div>
+                            <div class="archive-timeline-project" onclick="showProjectDetail('${update.projectId}')" style="cursor: pointer;">
+                                ${update.projectName}
+                            </div>
+                        </div>
+                        <div class="archive-timeline-content">${update.content}</div>
+                    </div>
+                `;
+            });
+
+            timelineDiv.innerHTML = html;
+        }
+
+        // Filter history archive
+        function filterHistoryArchive() {
+            const filterValue = document.getElementById('filter-project').value;
+            const items = document.querySelectorAll('.archive-timeline-item');
+
+            items.forEach(item => {
+                if (filterValue === 'all' || item.dataset.projectId === filterValue) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
         }
 
         // Toggle section
@@ -1312,6 +1717,7 @@
         // Close update modal
         function closeUpdateModal() {
             document.getElementById('update-modal').classList.remove('active');
+            delete document.getElementById('update-form').dataset.editingId;
         }
 
         // Save update
@@ -1325,13 +1731,26 @@
                 project.history = [];
             }
 
-            const update = {
-                id: Date.now().toString(),
-                date: document.getElementById('update-date').value,
-                content: document.getElementById('update-content').value
-            };
+            const editingId = document.getElementById('update-form').dataset.editingId;
 
-            project.history.push(update);
+            if (editingId) {
+                // Edit existing update
+                const update = project.history.find(u => u.id === editingId);
+                if (update) {
+                    update.date = document.getElementById('update-date').value;
+                    update.content = document.getElementById('update-content').value;
+                }
+                delete document.getElementById('update-form').dataset.editingId;
+            } else {
+                // Create new update
+                const update = {
+                    id: Date.now().toString(),
+                    date: document.getElementById('update-date').value,
+                    content: document.getElementById('update-content').value
+                };
+                project.history.push(update);
+            }
+
             saveProjects();
             renderHistory(project);
             closeUpdateModal();
