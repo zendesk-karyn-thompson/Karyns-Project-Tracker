@@ -1319,7 +1319,10 @@
                         <h3>Communication & Alignment</h3>
                         <span class="toggle">▼</span>
                     </div>
-                    <div class="section-content" id="section-communication"></div>
+                    <div class="section-content">
+                        <div id="section-slack-channel" style="margin-bottom: 16px;"></div>
+                        <div id="section-communication"></div>
+                    </div>
                 </div>
 
                 <div class="section">
@@ -1485,6 +1488,11 @@
                 <div class="form-group">
                     <label for="project-risks">Risks & Recommendations</label>
                     <textarea id="project-risks" placeholder="Blockers, dependencies, concerns, next steps"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="project-slack-channel">Slack Channel (Optional)</label>
+                    <input type="text" id="project-slack-channel" placeholder="#cold-lead-rewarm or https://zendesk.slack.com/...">
                 </div>
 
                 <div class="form-group">
@@ -1864,6 +1872,27 @@ Dashboard: https://..."></textarea>
             document.getElementById('detail-manager-snapshot').textContent = project.managerSnapshot || 'No snapshot provided';
 
             document.getElementById('section-overview').textContent = project.overview || 'No overview provided';
+
+            // Render Slack channel
+            const slackDiv = document.getElementById('section-slack-channel');
+            if (project.slackChannel) {
+                const isUrl = project.slackChannel.startsWith('http');
+                slackDiv.innerHTML = `
+                    <div style="background: #4A154B; color: white; padding: 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <span style="font-size: 20px;">💬</span>
+                        <div>
+                            <div style="font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">Slack Channel</div>
+                            <div style="font-size: 15px; font-weight: 600; margin-top: 4px;">
+                                ${isUrl ? `<a href="${project.slackChannel}" target="_blank" style="color: #D1F470; text-decoration: none;">${project.slackChannel.includes('#') ? project.slackChannel.split('#')[1] : 'Open Channel'}</a>` : project.slackChannel}
+                            </div>
+                            <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">Key stakeholders & executive buy-in</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                slackDiv.innerHTML = '';
+            }
+
             document.getElementById('section-communication').textContent = project.communication || 'No communication notes';
             document.getElementById('section-impact').textContent = project.impact || 'No impact data yet';
             document.getElementById('section-risks').textContent = project.risks || 'No risks identified';
@@ -2187,6 +2216,7 @@ Dashboard: https://..."></textarea>
             document.getElementById('project-exec-summary').value = project.executiveSummary || '';
             document.getElementById('project-manager-snapshot').value = project.managerSnapshot || '';
             document.getElementById('project-overview').value = project.overview || '';
+            document.getElementById('project-slack-channel').value = project.slackChannel || '';
             document.getElementById('project-communication').value = project.communication || '';
             document.getElementById('project-impact').value = project.impact || '';
             document.getElementById('project-risks').value = project.risks || '';
@@ -2224,6 +2254,7 @@ Dashboard: https://..."></textarea>
                 executiveSummary: document.getElementById('project-exec-summary').value,
                 managerSnapshot: document.getElementById('project-manager-snapshot').value,
                 overview: document.getElementById('project-overview').value,
+                slackChannel: document.getElementById('project-slack-channel').value,
                 communication: document.getElementById('project-communication').value,
                 impact: document.getElementById('project-impact').value,
                 risks: document.getElementById('project-risks').value,
