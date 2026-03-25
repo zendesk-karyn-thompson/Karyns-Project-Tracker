@@ -501,6 +501,120 @@
             border-bottom: none;
         }
 
+        .progress-bar-container {
+            background: rgba(255,255,255,0.2);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: white;
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .visual-tracker {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .status-breakdown,
+        .priority-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .breakdown-item {
+            background: rgba(255,255,255,0.15);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .breakdown-number {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .breakdown-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+        }
+
+        .timeline-view {
+            margin-top: 24px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 32px;
+            padding-bottom: 24px;
+            border-left: 2px solid #A1D78F;
+        }
+
+        .timeline-item:last-child {
+            border-left-color: transparent;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            background: #A1D78F;
+            border-radius: 50%;
+        }
+
+        .timeline-date {
+            font-weight: 600;
+            color: #2D4C33;
+            margin-bottom: 8px;
+        }
+
+        .timeline-content {
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .project-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+            padding: 20px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2D4C33;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         @media (max-width: 768px) {
             .projects-grid {
                 grid-template-columns: 1fr;
@@ -530,6 +644,9 @@
                     <div class="summary-card">
                         <h3>Overall Progress</h3>
                         <p id="overall-progress">Loading...</p>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="progress-bar"></div>
+                        </div>
                     </div>
                     <div class="summary-card">
                         <h3>Major Wins</h3>
@@ -543,6 +660,12 @@
                         <h3>Focus Areas</h3>
                         <p id="focus-areas">Review individual projects</p>
                     </div>
+                </div>
+
+                <div class="visual-tracker" id="visual-tracker">
+                    <h3 style="margin-top: 32px; margin-bottom: 20px; font-size: 18px;">Project Health Tracker</h3>
+                    <div class="status-breakdown" id="status-breakdown"></div>
+                    <div class="priority-breakdown" id="priority-breakdown"></div>
                 </div>
             </div>
 
@@ -642,10 +765,13 @@
                     <div class="section-content" id="section-skills"></div>
                 </div>
 
+                <div class="project-stats" id="project-stats"></div>
+
                 <div class="history-section">
-                    <h2 style="margin-bottom: 24px;">Historical Updates</h2>
+                    <h2 style="margin-bottom: 12px;">Historical Updates Archive</h2>
+                    <p style="color: #718096; margin-bottom: 24px; font-size: 14px;">Complete timeline of all project updates and milestones</p>
                     <button onclick="openUpdateModal()" style="margin-bottom: 24px;">+ Add Update</button>
-                    <div id="history-entries"></div>
+                    <div class="timeline-view" id="history-entries"></div>
                 </div>
 
                 <div class="form-actions">
@@ -863,6 +989,11 @@
             const inProgress = projects.filter(p => p.status === 'in-progress').length;
             const completed = projects.filter(p => p.status === 'completed').length;
             const blocked = projects.filter(p => p.status === 'blocked').length;
+            const notStarted = projects.filter(p => p.status === 'not-started').length;
+
+            // Calculate progress percentage
+            const progressPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
+            document.getElementById('progress-bar').style.width = progressPercent + '%';
 
             document.getElementById('overall-progress').textContent =
                 `${total} active projects: ${inProgress} in progress, ${completed} completed${blocked > 0 ? ', ' + blocked + ' blocked' : ''}`;
@@ -884,6 +1015,53 @@
                 highPriority.length > 0
                     ? highPriority.map(p => p.name).join(', ')
                     : 'All projects on track';
+
+            // Update visual tracker
+            updateVisualTracker(inProgress, completed, blocked, notStarted);
+        }
+
+        // Update visual tracker
+        function updateVisualTracker(inProgress, completed, blocked, notStarted) {
+            const statusBreakdown = document.getElementById('status-breakdown');
+            const priorityBreakdown = document.getElementById('priority-breakdown');
+
+            const highPriority = projects.filter(p => p.priority === 'high').length;
+            const mediumPriority = projects.filter(p => p.priority === 'medium').length;
+            const lowPriority = projects.filter(p => p.priority === 'low').length;
+
+            statusBreakdown.innerHTML = `
+                <div class="breakdown-item">
+                    <div class="breakdown-number">${inProgress}</div>
+                    <div class="breakdown-label">In Progress</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-number">${completed}</div>
+                    <div class="breakdown-label">Completed</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-number">${blocked}</div>
+                    <div class="breakdown-label">Blocked</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-number">${notStarted}</div>
+                    <div class="breakdown-label">Not Started</div>
+                </div>
+            `;
+
+            priorityBreakdown.innerHTML = `
+                <div class="breakdown-item">
+                    <div class="breakdown-number">${highPriority}</div>
+                    <div class="breakdown-label">High Priority</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-number">${mediumPriority}</div>
+                    <div class="breakdown-label">Medium Priority</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-number">${lowPriority}</div>
+                    <div class="breakdown-label">Low Priority</div>
+                </div>
+            `;
         }
 
         // Show project detail
@@ -914,9 +1092,40 @@
             document.getElementById('section-skills').innerHTML = formatSkills(project.skills);
 
             renderValueImpact(project);
+            renderProjectStats(project);
             renderHistory(project);
 
             window.scrollTo(0, 0);
+        }
+
+        // Render project stats
+        function renderProjectStats(project) {
+            const statsDiv = document.getElementById('project-stats');
+
+            const totalUpdates = project.history ? project.history.length : 0;
+            const daysActive = project.createdAt ?
+                Math.floor((new Date() - new Date(project.createdAt)) / (1000 * 60 * 60 * 24)) : 0;
+            const lastUpdateDays = project.history && project.history.length > 0 ?
+                Math.floor((new Date() - new Date(project.history[project.history.length - 1].date)) / (1000 * 60 * 60 * 24)) : 0;
+
+            statsDiv.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-number">${totalUpdates}</div>
+                    <div class="stat-label">Total Updates</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${daysActive}</div>
+                    <div class="stat-label">Days Active</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${lastUpdateDays}</div>
+                    <div class="stat-label">Days Since Update</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${formatStatus(project.status)}</div>
+                    <div class="stat-label">Current Status</div>
+                </div>
+            `;
         }
 
         // Render value & impact summary
@@ -960,19 +1169,17 @@
             const historyDiv = document.getElementById('history-entries');
 
             if (!project.history || project.history.length === 0) {
-                historyDiv.innerHTML = '<p style="color: #a0aec0;">No updates yet. Click "Add Update" to track progress over time.</p>';
+                historyDiv.innerHTML = '<p style="color: #a0aec0;">No updates yet. Click "Add Update" to start building your historical archive.</p>';
                 return;
             }
 
             historyDiv.innerHTML = project.history
                 .sort((a, b) => new Date(b.date) - new Date(a.date))
                 .map((entry, index) => `
-                    <div class="history-entry ${index > 0 ? 'collapsed' : ''}">
-                        <div class="history-date" onclick="toggleHistory(this)">
-                            <span>${formatDate(entry.date)}</span>
-                            <span style="font-size: 14px; color: #a0aec0;">▼</span>
-                        </div>
-                        <div class="history-content">${entry.content}</div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">${formatDate(entry.date)}</div>
+                        <div class="timeline-content">${entry.content}</div>
                     </div>
                 `).join('');
         }
