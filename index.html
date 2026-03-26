@@ -1370,10 +1370,9 @@
                 <div class="detailed-history-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <div>
-                            <h2 style="margin-bottom: 8px;">Historical Updates Archive</h2>
-                            <p style="color: #718096; font-size: 14px;">Complete timeline of all updates and milestones for this project</p>
+                            <h2 style="margin-bottom: 8px;">Historical Archive</h2>
+                            <p style="color: #718096; font-size: 14px;">Automatic snapshots of project state every time you update</p>
                         </div>
-                        <button onclick="openUpdateModal()">+ Add Update</button>
                     </div>
                     <div id="history-entries"></div>
                 </div>
@@ -1553,32 +1552,6 @@ Dashboard: https://..."></textarea>
         </div>
     </div>
 
-    <!-- Update Modal -->
-    <div id="update-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add Update</h2>
-                <button class="close-button" onclick="closeUpdateModal()">×</button>
-            </div>
-
-            <form id="update-form" onsubmit="saveUpdate(event)">
-                <div class="form-group">
-                    <label for="update-date">Date *</label>
-                    <input type="date" id="update-date" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="update-content">Update Notes *</label>
-                    <textarea id="update-content" required placeholder="Paste your update notes here. Include work completed, progress, decisions, blockers, etc."></textarea>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit">Save Update</button>
-                    <button type="button" class="secondary" onclick="closeUpdateModal()">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <script>
         // Data storage
@@ -1980,52 +1953,48 @@ Dashboard: https://..."></textarea>
             const historyDiv = document.getElementById('history-entries');
 
             if (!project.history || project.history.length === 0) {
-                historyDiv.innerHTML = '<p style="color: #a0aec0; text-align: center; padding: 40px;">No updates yet. Click "Add Update" to start building your historical archive.</p>';
+                historyDiv.innerHTML = '<p style="color: #a0aec0; text-align: center; padding: 40px;">No history yet. Historical snapshots will appear automatically when you edit this project.</p>';
                 return;
             }
 
             historyDiv.innerHTML = project.history
                 .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .map((entry, index) => `
-                    <div class="history-item-detailed">
-                        <div class="history-item-header">
-                            <div class="history-item-date">${formatDate(entry.date)}</div>
-                            <div class="history-item-actions">
-                                <button class="secondary" onclick="editUpdate('${entry.id}')" style="font-size: 12px;">Edit</button>
-                                <button class="secondary" onclick="deleteUpdate('${entry.id}')" style="font-size: 12px;">Delete</button>
+                .map((snapshot, index) => {
+                    const changes = [];
+
+                    if (snapshot.status) changes.push(`Status: ${formatStatus(snapshot.status)}`);
+                    if (snapshot.priority) changes.push(`Priority: ${formatPriority(snapshot.priority)}`);
+                    if (snapshot.needsPrioritization) changes.push('⚠️ Needed Asana Prioritization');
+
+                    return `
+                        <div class="history-item-detailed">
+                            <div class="history-item-header">
+                                <div>
+                                    <div class="history-item-date">${formatDate(snapshot.date.split('T')[0])} at ${new Date(snapshot.date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div>
+                                    ${changes.length > 0 ? `<div style="font-size: 12px; color: #64748b; margin-top: 4px;">${changes.join(' • ')}</div>` : ''}
+                                </div>
                             </div>
+                            ${snapshot.managerSnapshot ? `
+                                <div style="margin-top: 12px; padding: 12px; background: #fffaf0; border-left: 3px solid #FEEB7E; border-radius: 4px;">
+                                    <strong style="font-size: 11px; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px;">Manager Snapshot</strong>
+                                    <p style="margin-top: 6px; color: #2d3748;">${snapshot.managerSnapshot}</p>
+                                </div>
+                            ` : ''}
+                            ${snapshot.overview ? `
+                                <div style="margin-top: 12px;">
+                                    <strong style="font-size: 12px; color: #2d3748;">Overview:</strong>
+                                    <p style="margin-top: 6px; color: #4a5568; font-size: 14px;">${snapshot.overview.substring(0, 200)}${snapshot.overview.length > 200 ? '...' : ''}</p>
+                                </div>
+                            ` : ''}
+                            ${snapshot.risks ? `
+                                <div style="margin-top: 12px;">
+                                    <strong style="font-size: 12px; color: #2d3748;">Risks & Next Steps:</strong>
+                                    <p style="margin-top: 6px; color: #4a5568; font-size: 14px;">${snapshot.risks.substring(0, 200)}${snapshot.risks.length > 200 ? '...' : ''}</p>
+                                </div>
+                            ` : ''}
                         </div>
-                        <div class="timeline-content">${entry.content}</div>
-                    </div>
-                `).join('');
-        }
-
-        // Edit update
-        function editUpdate(updateId) {
-            const project = projects.find(p => p.id === currentProjectId);
-            if (!project) return;
-
-            const update = project.history.find(u => u.id === updateId);
-            if (!update) return;
-
-            document.getElementById('update-date').value = update.date;
-            document.getElementById('update-content').value = update.content;
-            document.getElementById('update-form').dataset.editingId = updateId;
-            document.getElementById('update-modal').classList.add('active');
-        }
-
-        // Delete update
-        function deleteUpdate(updateId) {
-            if (!confirm('Are you sure you want to delete this update? This cannot be undone.')) {
-                return;
-            }
-
-            const project = projects.find(p => p.id === currentProjectId);
-            if (!project) return;
-
-            project.history = project.history.filter(u => u.id !== updateId);
-            saveProjects();
-            renderHistory(project);
+                    `;
+                }).join('');
         }
 
         // Toggle history entry
@@ -2080,13 +2049,13 @@ Dashboard: https://..."></textarea>
                 filterSelect.innerHTML += `<option value="${project.id}">${project.name}</option>`;
             });
 
-            // Collect all updates
+            // Collect all snapshots
             let allUpdates = [];
             projects.forEach(project => {
                 if (project.history && project.history.length > 0) {
-                    project.history.forEach(update => {
+                    project.history.forEach(snapshot => {
                         allUpdates.push({
-                            ...update,
+                            ...snapshot,
                             projectId: project.id,
                             projectName: project.name,
                             projectStatus: project.status
@@ -2128,8 +2097,8 @@ Dashboard: https://..."></textarea>
             if (allUpdates.length === 0) {
                 timelineDiv.innerHTML = `
                     <div class="empty-state">
-                        <h3>No updates yet</h3>
-                        <p>Start adding updates to your projects to build your historical archive</p>
+                        <h3>No history yet</h3>
+                        <p>Historical snapshots will appear automatically when you edit projects</p>
                     </div>
                 `;
                 return;
@@ -2138,8 +2107,8 @@ Dashboard: https://..."></textarea>
             let html = '';
             let currentMonth = '';
 
-            allUpdates.forEach((update, index) => {
-                const updateDate = new Date(update.date);
+            allUpdates.forEach((snapshot, index) => {
+                const updateDate = new Date(snapshot.date);
                 const monthYear = updateDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
                 // Add month separator
@@ -2153,16 +2122,21 @@ Dashboard: https://..."></textarea>
                     `;
                 }
 
+                const changes = [];
+                if (snapshot.status) changes.push(`Status: ${formatStatus(snapshot.status)}`);
+                if (snapshot.priority) changes.push(`Priority: ${formatPriority(snapshot.priority)}`);
+
                 html += `
-                    <div class="archive-timeline-item" data-project-id="${update.projectId}">
+                    <div class="archive-timeline-item" data-project-id="${snapshot.projectId}">
                         <div class="archive-timeline-dot"></div>
                         <div class="archive-timeline-header">
-                            <div class="archive-timeline-date">${formatDate(update.date)}</div>
-                            <div class="archive-timeline-project" onclick="showProjectDetail('${update.projectId}')" style="cursor: pointer;">
-                                ${update.projectName}
+                            <div class="archive-timeline-date">${formatDate(snapshot.date.split('T')[0])} at ${new Date(snapshot.date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</div>
+                            <div class="archive-timeline-project" onclick="showProjectDetail('${snapshot.projectId}')" style="cursor: pointer;">
+                                ${snapshot.projectName}
                             </div>
                         </div>
-                        <div class="archive-timeline-content">${update.content}</div>
+                        ${changes.length > 0 ? `<div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">${changes.join(' • ')}</div>` : ''}
+                        ${snapshot.managerSnapshot ? `<div class="archive-timeline-content"><strong>Snapshot:</strong> ${snapshot.managerSnapshot}</div>` : ''}
                     </div>
                 `;
             });
@@ -2264,9 +2238,33 @@ Dashboard: https://..."></textarea>
             };
 
             if (editingProjectId) {
-                // Edit existing project
+                // Edit existing project - archive previous state
                 const index = projects.findIndex(p => p.id === editingProjectId);
-                projects[index] = { ...projects[index], ...projectData };
+                const oldProject = projects[index];
+
+                // Create history snapshot of previous state
+                if (!oldProject.history) {
+                    oldProject.history = [];
+                }
+
+                // Archive the previous snapshot
+                const snapshot = {
+                    id: Date.now().toString(),
+                    date: new Date().toISOString(),
+                    status: oldProject.status,
+                    priority: oldProject.priority,
+                    managerSnapshot: oldProject.managerSnapshot,
+                    overview: oldProject.overview,
+                    communication: oldProject.communication,
+                    impact: oldProject.impact,
+                    risks: oldProject.risks,
+                    needsPrioritization: oldProject.needsPrioritization
+                };
+
+                oldProject.history.push(snapshot);
+
+                // Update with new data
+                projects[index] = { ...oldProject, ...projectData, lastUpdated: new Date().toISOString() };
                 showProjectDetail(editingProjectId);
             } else {
                 // Create new project
@@ -2274,7 +2272,8 @@ Dashboard: https://..."></textarea>
                     id: Date.now().toString(),
                     ...projectData,
                     history: [],
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    lastUpdated: new Date().toISOString()
                 };
                 projects.push(newProject);
                 renderDashboard();
@@ -2296,54 +2295,6 @@ Dashboard: https://..."></textarea>
             renderDashboard();
         }
 
-        // Open update modal
-        function openUpdateModal() {
-            document.getElementById('update-date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('update-content').value = '';
-            document.getElementById('update-modal').classList.add('active');
-        }
-
-        // Close update modal
-        function closeUpdateModal() {
-            document.getElementById('update-modal').classList.remove('active');
-            delete document.getElementById('update-form').dataset.editingId;
-        }
-
-        // Save update
-        function saveUpdate(event) {
-            event.preventDefault();
-
-            const project = projects.find(p => p.id === currentProjectId);
-            if (!project) return;
-
-            if (!project.history) {
-                project.history = [];
-            }
-
-            const editingId = document.getElementById('update-form').dataset.editingId;
-
-            if (editingId) {
-                // Edit existing update
-                const update = project.history.find(u => u.id === editingId);
-                if (update) {
-                    update.date = document.getElementById('update-date').value;
-                    update.content = document.getElementById('update-content').value;
-                }
-                delete document.getElementById('update-form').dataset.editingId;
-            } else {
-                // Create new update
-                const update = {
-                    id: Date.now().toString(),
-                    date: document.getElementById('update-date').value,
-                    content: document.getElementById('update-content').value
-                };
-                project.history.push(update);
-            }
-
-            saveProjects();
-            renderHistory(project);
-            closeUpdateModal();
-        }
 
         // Export data
         function exportData() {
