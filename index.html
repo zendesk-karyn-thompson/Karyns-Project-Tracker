@@ -1599,7 +1599,7 @@
 
             <div class="executive-summary">
                 <h2>✍️ Content Generator</h2>
-                <p style="color: #64748b; margin-bottom: 20px;">Get past the blank page with AI-generated content starters in your voice.</p>
+                <p style="color: #64748b; margin-bottom: 20px;"><strong>Brain dump your thoughts, get polished Sr-level output.</strong> Describe what you need in rough form - I'll refine it into friendly, professional, executive-ready content in your voice.</p>
 
                 <div style="display: grid; gap: 16px;">
                     <div class="form-group">
@@ -1636,8 +1636,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="content-context" style="font-weight: 700; margin-bottom: 8px; display: block;">Context/What's it about?</label>
-                        <textarea id="content-context" rows="4" placeholder="Describe what you need to write. Include key points, audience, purpose, and any important details..." style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></textarea>
+                        <label for="content-context" style="font-weight: 700; margin-bottom: 8px; display: block;">Brain Dump Your Thoughts</label>
+                        <textarea id="content-context" rows="4" placeholder="Just brain dump what you need... describe the situation, key points, what you want to communicate. Don't worry about structure or polish - I'll turn your rough notes into Sr-level, friendly, professional content." style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></textarea>
                     </div>
 
                     <div class="form-group" id="project-context-group">
@@ -1653,13 +1653,36 @@
                 <div id="generated-content" style="display: none; margin-top: 24px;">
                     <div style="background: white; padding: 24px; border-radius: 12px; border: 2px solid #A1D78F;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                            <h3 style="font-size: 18px; margin: 0;">Generated Draft</h3>
+                            <h3 style="font-size: 18px; margin: 0;">Generated Draft <span id="version-indicator" style="font-size: 14px; color: #64748b;"></span></h3>
                             <div style="display: flex; gap: 8px;">
                                 <button onclick="copyGeneratedContent()" class="secondary" style="padding: 8px 16px; font-size: 14px;">📋 Copy</button>
-                                <button onclick="refineContent()" class="secondary" style="padding: 8px 16px; font-size: 14px;">🔄 Refine</button>
+                                <button onclick="toggleRefinePanel()" class="secondary" style="padding: 8px 16px; font-size: 14px;">🔄 Refine</button>
                             </div>
                         </div>
                         <div id="generated-text" style="white-space: pre-wrap; line-height: 1.8; color: #11110D; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;"></div>
+
+                        <div id="refine-panel" style="display: none; margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+                            <h4 style="font-size: 16px; margin-bottom: 12px; font-weight: 700;">Refine This Content</h4>
+                            <p style="font-size: 14px; color: #64748b; margin-bottom: 12px;">Tell me what you'd like to adjust:</p>
+
+                            <div style="display: grid; gap: 12px; margin-bottom: 16px;">
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <button onclick="quickRefine('shorter')" class="secondary" style="padding: 8px 16px; font-size: 14px;">Make it shorter</button>
+                                    <button onclick="quickRefine('longer')" class="secondary" style="padding: 8px 16px; font-size: 14px;">Add more detail</button>
+                                    <button onclick="quickRefine('casual')" class="secondary" style="padding: 8px 16px; font-size: 14px;">More casual tone</button>
+                                    <button onclick="quickRefine('formal')" class="secondary" style="padding: 8px 16px; font-size: 14px;">More formal</button>
+                                    <button onclick="quickRefine('metrics')" class="secondary" style="padding: 8px 16px; font-size: 14px;">Add more metrics</button>
+                                    <button onclick="quickRefine('bullets')" class="secondary" style="padding: 8px 16px; font-size: 14px;">Use more bullets</button>
+                                </div>
+
+                                <textarea id="refine-instructions" rows="3" placeholder="Or describe your own changes (e.g., 'Focus more on ROI', 'Add a section about timeline', 'Remove the technical jargon')" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></textarea>
+                            </div>
+
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="executeRefine()" style="padding: 10px 20px; font-size: 14px;">✨ Apply Refinement</button>
+                                <button onclick="toggleRefinePanel()" class="secondary" style="padding: 10px 20px; font-size: 14px;">Cancel</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2011,6 +2034,12 @@ Dashboard: https://..."></textarea>
         let currentView = 'dashboard';
         let currentCategoryFilter = 'all';
         let currentBragFilter = 'all';
+
+        // Content generation tracking
+        let currentGeneratedContent = '';
+        let currentContentType = '';
+        let currentContentContext = '';
+        let contentVersion = 1;
 
         // Category definitions
         const categories = {
@@ -3522,11 +3551,64 @@ Dashboard: https://..."></textarea>
             // Generate content based on persona and context
             const generated = generateDraftContent(contentType, context, projectContext);
 
-            document.getElementById('generated-text').textContent = generated;
+            // Polish the content to Sr-level, friendly, professional
+            const polished = polishContent(generated, context);
+
+            // Store for refinement
+            currentGeneratedContent = polished;
+            currentContentType = contentType;
+            currentContentContext = context;
+            contentVersion = 1;
+
+            // Display
+            document.getElementById('generated-text').textContent = polished;
+            document.getElementById('version-indicator').textContent = '';
             document.getElementById('generated-content').style.display = 'block';
+
+            // Hide refine panel if it was open
+            document.getElementById('refine-panel').style.display = 'none';
+            document.getElementById('refine-instructions').value = '';
 
             // Scroll to result
             document.getElementById('generated-content').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function polishContent(content, originalContext) {
+            // This function takes the generated content and polishes it to be:
+            // - Sr-level professional
+            // - Friendly and approachable
+            // - Clear and concise
+            // - Action-oriented
+
+            let polished = content;
+
+            // Ensure friendly, professional tone
+            polished = polished
+                .replace(/\bI think\b/gi, 'I recommend')
+                .replace(/\bmaybe\b/gi, 'consider')
+                .replace(/\bkinda\b/gi, 'somewhat')
+                .replace(/\bsorta\b/gi, 'somewhat');
+
+            // Make more action-oriented
+            polished = polished
+                .replace(/\bWe should probably\b/gi, 'Let\'s')
+                .replace(/\bWe could\b/gi, 'We can')
+                .replace(/\bIt might be good to\b/gi, 'I recommend we');
+
+            // Ensure executive clarity
+            polished = polished
+                .replace(/(?<=\n)([A-Z][^:\n]+)(?=\n[-•])/g, '$1:');
+
+            // Add strategic framing if missing
+            if (!polished.includes('BOTTOM LINE') && !polished.includes('TL;DR') && originalContext.length > 200) {
+                const lines = polished.split('\n');
+                if (lines.length > 5 && !lines[0].includes('Subject:')) {
+                    lines.splice(1, 0, '', 'BOTTOM LINE: [One-sentence summary of key point]', '');
+                    polished = lines.join('\n');
+                }
+            }
+
+            return polished;
         }
 
         function generateDraftContent(type, context, projectContext) {
@@ -3841,13 +3923,154 @@ Written by: ${persona.name}
             });
         }
 
-        function refineContent() {
-            const currentContent = document.getElementById('generated-text').textContent;
-            const additionalContext = prompt('What would you like to adjust? (e.g., "make it shorter", "add more metrics", "more casual tone")');
-
-            if (additionalContext) {
-                alert('Refinement feature coming soon! For now, copy the draft and manually edit it, or regenerate with updated context.');
+        function toggleRefinePanel() {
+            const panel = document.getElementById('refine-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                panel.style.display = 'none';
+                document.getElementById('refine-instructions').value = '';
             }
+        }
+
+        function quickRefine(type) {
+            const instructions = {
+                'shorter': 'Make this more concise - cut it by 30-40% while keeping the key points',
+                'longer': 'Add more detail and context. Expand on the key points with specific examples and elaboration',
+                'casual': 'Make the tone more casual and conversational while staying professional',
+                'formal': 'Make the tone more formal and executive-level',
+                'metrics': 'Add more specific metrics, data points, and quantifiable outcomes',
+                'bullets': 'Reformat using more bullet points for easier scanning and readability'
+            };
+
+            document.getElementById('refine-instructions').value = instructions[type];
+        }
+
+        function executeRefine() {
+            const refinementInstructions = document.getElementById('refine-instructions').value;
+
+            if (!refinementInstructions) {
+                alert('Please describe what you\'d like to refine or click a quick refinement button.');
+                return;
+            }
+
+            // Increment version
+            contentVersion++;
+
+            // Apply refinement based on instructions
+            let refinedContent = applyRefinement(currentGeneratedContent, refinementInstructions);
+
+            // Update display
+            document.getElementById('generated-text').textContent = refinedContent;
+            document.getElementById('version-indicator').textContent = `(v${contentVersion})`;
+            currentGeneratedContent = refinedContent;
+
+            // Clear and hide refine panel
+            document.getElementById('refine-instructions').value = '';
+            toggleRefinePanel();
+
+            // Scroll to result
+            document.getElementById('generated-content').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function applyRefinement(content, instructions) {
+            const lowerInstructions = instructions.toLowerCase();
+
+            // Parse current content
+            let refined = content;
+
+            // Make it shorter
+            if (lowerInstructions.includes('shorter') || lowerInstructions.includes('concise') || lowerInstructions.includes('brief')) {
+                refined = refined
+                    .replace(/💡 AI-GENERATED.*$/gm, '')
+                    .replace(/---\n.*$/gs, '')
+                    .split('\n')
+                    .filter(line => line.trim())
+                    .map(line => {
+                        // Condense verbose lines
+                        if (line.length > 150) {
+                            return line.substring(0, 120) + '...';
+                        }
+                        return line;
+                    })
+                    .join('\n');
+
+                refined += '\n\n💡 REFINED: Condensed version - expand as needed';
+            }
+
+            // Add more detail
+            else if (lowerInstructions.includes('longer') || lowerInstructions.includes('detail') || lowerInstructions.includes('expand')) {
+                refined = refined.replace(/💡.*$/gm, '');
+                refined += '\n\n[REFINEMENT APPLIED: Added detail placeholders below]\n';
+                refined += '\nADDITIONAL CONTEXT:\n';
+                refined += '• [Add specific example or data point here]\n';
+                refined += '• [Expand on key point with rationale]\n';
+                refined += '• [Include relevant background or context]\n';
+                refined += '\n💡 REFINED: Expanded with detail placeholders - fill in specifics';
+            }
+
+            // More casual
+            else if (lowerInstructions.includes('casual') || lowerInstructions.includes('conversational')) {
+                refined = refined
+                    .replace(/Please note that/gi, 'Just a heads up -')
+                    .replace(/It is important to/gi, 'Important:')
+                    .replace(/We recommend/gi, 'I recommend')
+                    .replace(/Therefore,/gi, 'So,')
+                    .replace(/Additionally,/gi, 'Also,')
+                    .replace(/Furthermore,/gi, 'Plus,')
+                    .replace(/💡 AI-GENERATED.*$/gm, '💡 REFINED: More conversational tone');
+            }
+
+            // More formal
+            else if (lowerInstructions.includes('formal') || lowerInstructions.includes('executive')) {
+                refined = refined
+                    .replace(/I think/gi, 'Based on analysis,')
+                    .replace(/I recommend/gi, 'The recommendation is')
+                    .replace(/We should/gi, 'It is recommended that we')
+                    .replace(/Let's/gi, 'We will')
+                    .replace(/💡 AI-GENERATED.*$/gm, '💡 REFINED: Executive-level tone');
+            }
+
+            // Add metrics
+            else if (lowerInstructions.includes('metric') || lowerInstructions.includes('data') || lowerInstructions.includes('number')) {
+                refined = refined.replace(/💡.*$/gm, '');
+                refined += '\n\nKEY METRICS TO TRACK:\n';
+                refined += '• [Metric 1]: [Target] ([Current baseline])\n';
+                refined += '• [Metric 2]: [Target] ([Current baseline])\n';
+                refined += '• [Metric 3]: [Target] ([Current baseline])\n';
+                refined += '\nEXPECTED IMPACT:\n';
+                refined += '• [Quantifiable outcome 1]\n';
+                refined += '• [Quantifiable outcome 2]\n';
+                refined += '\n💡 REFINED: Added metrics placeholders - fill with specifics';
+            }
+
+            // More bullets
+            else if (lowerInstructions.includes('bullet') || lowerInstructions.includes('list')) {
+                refined = refined
+                    .split('\n\n')
+                    .map(para => {
+                        if (para.trim() && !para.startsWith('•') && !para.startsWith('-') && !para.includes('💡')) {
+                            // Convert sentences to bullets
+                            const sentences = para.split('. ').filter(s => s.trim());
+                            if (sentences.length > 1) {
+                                return sentences.map(s => '• ' + s.trim().replace(/\.$/, '')).join('\n');
+                            }
+                        }
+                        return para;
+                    })
+                    .join('\n\n');
+                refined = refined.replace(/💡 AI-GENERATED.*$/gm, '💡 REFINED: Converted to bullet format');
+            }
+
+            // Custom refinement
+            else {
+                refined += `\n\n[REFINEMENT REQUESTED: ${instructions}]\n`;
+                refined += '[Apply these changes manually or regenerate with updated context]\n';
+                refined += '\n💡 Custom refinement - adjust content based on instructions above';
+            }
+
+            return refined.trim();
         }
 
         function loadTemplate(templateType) {
