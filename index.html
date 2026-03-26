@@ -1554,8 +1554,8 @@
         <!-- Digital Twin View -->
         <div id="digital-twin-view" class="hidden">
             <header>
-                <h1>🤖 Digital Twin</h1>
-                <p class="subtitle">Your AI writing assistant trained on your tone, expertise, and communication style</p>
+                <h1>🤖 Digital Twin - Nurture & Prospecting Marketing Expert</h1>
+                <p class="subtitle">Your AI marketing strategist for lifecycle programs, nurture campaigns, lead generation, and demand gen</p>
             </header>
 
             <div class="executive-summary">
@@ -1606,15 +1606,32 @@
                         <label for="content-type" style="font-weight: 700; margin-bottom: 8px; display: block;">What do you need help with?</label>
                         <select id="content-type" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;">
                             <option value="">Select a type...</option>
-                            <option value="email">Email</option>
-                            <option value="slack">Slack Message</option>
-                            <option value="brief">Campaign Brief</option>
-                            <option value="update">Status Update</option>
-                            <option value="presentation">Presentation Outline</option>
-                            <option value="summary">Executive Summary</option>
-                            <option value="plan">Project Plan</option>
-                            <option value="feedback">Feedback/Review</option>
-                            <option value="custom">Custom</option>
+                            <optgroup label="📧 Nurture & Email">
+                                <option value="nurture-email">Nurture Email Copy</option>
+                                <option value="email-series">Email Series Plan</option>
+                                <option value="subject-lines">Email Subject Lines</option>
+                                <option value="email">General Email</option>
+                            </optgroup>
+                            <optgroup label="📋 Campaign Planning">
+                                <option value="brief">Campaign Brief</option>
+                                <option value="nurture-strategy">Nurture Strategy</option>
+                                <option value="audience-segmentation">Audience Segmentation</option>
+                                <option value="plan">Project Plan</option>
+                            </optgroup>
+                            <optgroup label="📊 Analysis & Reporting">
+                                <option value="results-analysis">Campaign Results Analysis</option>
+                                <option value="ab-test">A/B Test Plan</option>
+                                <option value="summary">Executive Summary</option>
+                                <option value="update">Status Update</option>
+                            </optgroup>
+                            <optgroup label="💬 Communication">
+                                <option value="slack">Slack Message</option>
+                                <option value="presentation">Presentation Outline</option>
+                                <option value="feedback">Feedback/Review</option>
+                            </optgroup>
+                            <optgroup label="Other">
+                                <option value="custom">Custom</option>
+                            </optgroup>
                         </select>
                     </div>
 
@@ -1648,44 +1665,131 @@
             </div>
 
             <div class="executive-summary">
+                <h2>🎯 Marketing Strategy Brainstorming</h2>
+                <p style="color: #64748b; margin-bottom: 20px;">Get expert guidance on nurture programs, prospecting campaigns, and lifecycle marketing strategy.</p>
+
+                <div style="display: grid; gap: 16px;">
+                    <div class="form-group">
+                        <label for="strategy-topic" style="font-weight: 700; margin-bottom: 8px; display: block;">What do you want to brainstorm?</label>
+                        <select id="strategy-topic" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;">
+                            <option value="">Choose a topic...</option>
+                            <option value="nurture-program">New Nurture Program Strategy</option>
+                            <option value="lead-scoring">Lead Scoring Model</option>
+                            <option value="cold-lead-reactivation">Cold Lead Reactivation Campaign</option>
+                            <option value="audience-segmentation">Audience Segmentation Strategy</option>
+                            <option value="email-cadence">Email Cadence & Frequency</option>
+                            <option value="content-strategy">Content Strategy for Lifecycle Stage</option>
+                            <option value="metrics-kpis">Metrics & KPIs for Program</option>
+                            <option value="ab-testing">A/B Testing Strategy</option>
+                            <option value="program-optimization">Program Optimization Ideas</option>
+                            <option value="persona-nurture">Persona-Based Nurture Tracks</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="strategy-context" style="font-weight: 700; margin-bottom: 8px; display: block;">Tell me about your situation</label>
+                        <textarea id="strategy-context" rows="4" placeholder="e.g., We have 50K cold leads from paid acquisition who haven't engaged in 6+ months. Need a reactivation strategy targeting CX and IT personas..." style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></textarea>
+                    </div>
+
+                    <button onclick="generateStrategy()" style="margin-top: 12px;">💡 Get Strategic Recommendations</button>
+                </div>
+
+                <div id="strategy-output" style="display: none; margin-top: 24px;">
+                    <div style="background: white; padding: 24px; border-radius: 12px; border: 2px solid #2D4C33;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="font-size: 18px; margin: 0;">Strategic Recommendations</h3>
+                            <button onclick="copyStrategyOutput()" class="secondary" style="padding: 8px 16px; font-size: 14px;">📋 Copy</button>
+                        </div>
+                        <div id="strategy-text" style="white-space: pre-wrap; line-height: 1.8; color: #11110D; font-size: 15px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="executive-summary">
+                <h2>⚡ Quick Marketing Tools</h2>
+                <p style="color: #64748b; margin-bottom: 20px;">Instant generators for email subject lines, CTAs, campaign names, and more.</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="background: white; padding: 24px; border-radius: 12px; border: 2px solid #e2e8f0;">
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">📧 Email Subject Lines</h4>
+                        <input type="text" id="subject-context" placeholder="What's the email about?" style="width: 100%; padding: 10px; border-radius: 6px; border: 2px solid #e2e8f0; font-size: 14px; margin-bottom: 12px;">
+                        <button onclick="generateSubjectLines()" style="padding: 10px 20px; font-size: 14px;">Generate 5 Subject Lines</button>
+                        <div id="subject-output" style="margin-top: 12px; display: none;">
+                            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 14px; line-height: 1.8;" id="subject-text"></div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 24px; border-radius: 12px; border: 2px solid #e2e8f0;">
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">🎯 CTA Suggestions</h4>
+                        <input type="text" id="cta-context" placeholder="What action do you want?" style="width: 100%; padding: 10px; border-radius: 6px; border: 2px solid #e2e8f0; font-size: 14px; margin-bottom: 12px;">
+                        <button onclick="generateCTAs()" style="padding: 10px 20px; font-size: 14px;">Generate CTAs</button>
+                        <div id="cta-output" style="margin-top: 12px; display: none;">
+                            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 14px; line-height: 1.8;" id="cta-text"></div>
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 24px; border-radius: 12px; border: 2px solid #e2e8f0;">
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">🏷️ Campaign Naming</h4>
+                        <input type="text" id="campaign-context" placeholder="Describe the campaign" style="width: 100%; padding: 10px; border-radius: 6px; border: 2px solid #e2e8f0; font-size: 14px; margin-bottom: 12px;">
+                        <button onclick="generateCampaignNames()" style="padding: 10px 20px; font-size: 14px;">Generate Names</button>
+                        <div id="campaign-name-output" style="margin-top: 12px; display: none;">
+                            <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; font-size: 14px; line-height: 1.8;" id="campaign-name-text"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="executive-summary">
                 <h2>📚 Quick Templates</h2>
-                <p style="color: #64748b; margin-bottom: 20px;">Pre-built templates in your voice for common scenarios.</p>
+                <p style="color: #64748b; margin-bottom: 20px;">Pre-built templates for common marketing scenarios.</p>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;">
+                    <div onclick="loadTemplate('nurture-email')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📧</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Nurture Email</h4>
+                        <p style="font-size: 14px; color: #64748b;">Lifecycle email copy</p>
+                    </div>
+
+                    <div onclick="loadTemplate('campaign-brief')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📋</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Campaign Brief</h4>
+                        <p style="font-size: 14px; color: #64748b;">Full program overview</p>
+                    </div>
+
+                    <div onclick="loadTemplate('email-series')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📬</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Email Series Plan</h4>
+                        <p style="font-size: 14px; color: #64748b;">Multi-touch sequence</p>
+                    </div>
+
+                    <div onclick="loadTemplate('campaign-results')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📈</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Campaign Results</h4>
+                        <p style="font-size: 14px; color: #64748b;">Performance analysis</p>
+                    </div>
+
                     <div onclick="loadTemplate('campaign-kickoff')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
                         <div style="font-size: 32px; margin-bottom: 12px;">🚀</div>
                         <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Campaign Kickoff</h4>
-                        <p style="font-size: 14px; color: #64748b;">Launch announcement email</p>
+                        <p style="font-size: 14px; color: #64748b;">Launch announcement</p>
                     </div>
 
                     <div onclick="loadTemplate('status-update')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
                         <div style="font-size: 32px; margin-bottom: 12px;">📊</div>
                         <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Status Update</h4>
-                        <p style="font-size: 14px; color: #64748b;">Project progress report</p>
+                        <p style="font-size: 14px; color: #64748b;">Progress report</p>
                     </div>
 
-                    <div onclick="loadTemplate('stakeholder-request')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
-                        <div style="font-size: 32px; margin-bottom: 12px;">📝</div>
-                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Stakeholder Request</h4>
-                        <p style="font-size: 14px; color: #64748b;">Ask for input or approval</p>
+                    <div onclick="loadTemplate('ab-test-plan')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🧪</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">A/B Test Plan</h4>
+                        <p style="font-size: 14px; color: #64748b;">Testing strategy</p>
                     </div>
 
-                    <div onclick="loadTemplate('program-brief')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
-                        <div style="font-size: 32px; margin-bottom: 12px;">📋</div>
-                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Program Brief</h4>
-                        <p style="font-size: 14px; color: #64748b;">Campaign overview doc</p>
-                    </div>
-
-                    <div onclick="loadTemplate('results-summary')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
-                        <div style="font-size: 32px; margin-bottom: 12px;">📈</div>
-                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Results Summary</h4>
-                        <p style="font-size: 14px; color: #64748b;">Post-campaign analysis</p>
-                    </div>
-
-                    <div onclick="loadTemplate('meeting-agenda')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
-                        <div style="font-size: 32px; margin-bottom: 12px;">📅</div>
-                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Meeting Agenda</h4>
-                        <p style="font-size: 14px; color: #64748b;">Structured meeting outline</p>
+                    <div onclick="loadTemplate('audience-segmentation')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🎯</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Audience Segmentation</h4>
+                        <p style="font-size: 14px; color: #64748b;">Targeting strategy</p>
                     </div>
                 </div>
             </div>
@@ -3443,6 +3547,13 @@ Audience: ${persona.audience}`;
                 'summary': generateSummary,
                 'plan': generatePlan,
                 'feedback': generateFeedback,
+                'nurture-email': generateNurtureEmail,
+                'email-series': generateEmailSeries,
+                'subject-lines': generateSubjectLinesContent,
+                'nurture-strategy': generateNurtureStrategy,
+                'audience-segmentation': generateAudienceSegmentation,
+                'results-analysis': generateResultsAnalysis,
+                'ab-test': generateABTest,
                 'custom': generateCustom
             };
 
@@ -3741,29 +3852,37 @@ Written by: ${persona.name}
 
         function loadTemplate(templateType) {
             const templates = {
+                'nurture-email': {
+                    type: 'nurture-email',
+                    context: 'Write nurture email copy for prospects in the awareness/consideration stage. Persona: [specify]. Goal: Drive engagement and education. Include: value prop, educational content link, soft CTA. Tone: helpful, not salesy.'
+                },
+                'campaign-brief': {
+                    type: 'brief',
+                    context: 'Comprehensive campaign brief for new lifecycle marketing initiative. Include: objectives, target audience/personas, success metrics (open rate, CTR, engaged sessions, MQLs), timeline, email cadence, OKR alignment, and regional considerations.'
+                },
+                'email-series': {
+                    type: 'email-series',
+                    context: 'Plan a 5-email nurture series for cold leads. Audience: [personas]. Goal: Reactivation and re-engagement. Include: email themes, timing/cadence, CTAs, content strategy progression (awareness → consideration → engagement).'
+                },
+                'campaign-results': {
+                    type: 'results-analysis',
+                    context: 'Post-campaign performance analysis. Campaign: [name]. Include: key metrics vs. benchmarks (open rate, CTR, engaged sessions, MQLs), what worked well, what didn\'t, actionable learnings, recommendations for next campaign.'
+                },
                 'campaign-kickoff': {
                     type: 'email',
-                    context: 'Announcing the launch of a new campaign to cross-functional stakeholders. Include: campaign name, target audience, key dates, what they need to do, and where to find more information.'
+                    context: 'Announcing the launch of a new nurture campaign to cross-functional stakeholders. Include: campaign name, target audience/personas, launch date, key touchpoints, what regional teams need to do, where to find campaign details.'
                 },
                 'status-update': {
                     type: 'update',
-                    context: 'Weekly project status update for leadership covering: what was completed this week, what\'s in progress, upcoming milestones, any blockers or risks, and key metrics/progress toward goals.'
+                    context: 'Weekly campaign status update for leadership. Include: what launched/completed this week, in-progress items, upcoming milestones, blockers/risks, early performance metrics if available, on-track for goals.'
                 },
-                'stakeholder-request': {
-                    type: 'email',
-                    context: 'Requesting input or approval from stakeholders on a campaign plan. Include: background, what you need from them, timeline for response, and impact/rationale for the request.'
+                'ab-test-plan': {
+                    type: 'ab-test',
+                    context: 'A/B test plan for email campaign. What to test: [subject line/CTA/content]. Hypothesis: [what you expect]. Sample size needed, success criteria, how to measure statistical significance, rollout plan for winner.'
                 },
-                'program-brief': {
-                    type: 'brief',
-                    context: 'Comprehensive program brief for a new lifecycle marketing initiative including objectives, target audience, success metrics, timeline, and strategic alignment with company OKRs.'
-                },
-                'results-summary': {
-                    type: 'summary',
-                    context: 'Post-campaign results summary for leadership including: campaign overview, performance metrics vs goals, key learnings, and recommendations for future campaigns.'
-                },
-                'meeting-agenda': {
-                    type: 'custom',
-                    context: 'Meeting agenda for campaign planning session. Include: objectives, topics to cover, decisions needed, participants, and time allocations for each section.'
+                'audience-segmentation': {
+                    type: 'audience-segmentation',
+                    context: 'Audience segmentation strategy for nurture program. Total audience size: [X]. Personas: [list]. Segmentation criteria: engagement level, industry, company size, lifecycle stage. How to personalize messaging for each segment.'
                 }
             };
 
@@ -3780,6 +3899,810 @@ Written by: ${persona.name}
                     document.getElementById('content-context').focus();
                 }, 500);
             }
+        }
+
+        // Marketing-specific content generators
+        function generateNurtureEmail(context, projectContext, personaContext) {
+            return `Subject: [Compelling Subject Line]
+
+Hi {{First Name}},
+
+[Opening hook - pain point or value]
+
+${context}
+
+[Key educational insight or value proposition]
+
+[Link to relevant content/resource]
+
+[Soft CTA - no pressure]
+→ [Action text]
+
+Looking forward to helping you [achieve goal],
+${persona.name || 'Your Name'}
+
+---
+💡 NURTURE EMAIL DRAFT - Personalize and add specific links`;
+        }
+
+        function generateEmailSeries(context, projectContext, personaContext) {
+            return `EMAIL NURTURE SERIES PLAN
+
+${context}
+
+EMAIL 1: AWARENESS (Day 1)
+Subject: [Problem/pain point focus]
+Goal: Educate on the challenge
+Content: Industry insight, stat, or trend
+CTA: Read blog/guide
+
+EMAIL 2: EDUCATION (Day 4)
+Subject: [Solution approach]
+Goal: Introduce solution category
+Content: Educational resource, how-to
+CTA: Download guide/Watch video
+
+EMAIL 3: CONSIDERATION (Day 8)
+Subject: [Differentiation]
+Goal: Show unique approach
+Content: Case study or customer story
+CTA: View case study
+
+EMAIL 4: ENGAGEMENT (Day 12)
+Subject: [Value demonstration]
+Goal: Show specific value
+Content: Product/feature highlight
+CTA: Start trial/Request demo
+
+EMAIL 5: CONVERSION (Day 16)
+Subject: [Decision support]
+Goal: Remove friction
+Content: Social proof, ROI calculator
+CTA: Talk to sales/Start free trial
+
+---
+💡 SERIES PLAN - Adjust timing and content based on engagement`;
+        }
+
+        function generateNurtureStrategy(context, projectContext, personaContext) {
+            return `NURTURE STRATEGY RECOMMENDATIONS
+
+SITUATION
+${context}
+
+RECOMMENDED APPROACH
+• Program Type: [Evergreen nurture / Time-based sequence / Trigger-based]
+• Duration: [X weeks/months]
+• Email Cadence: [X emails per week/month]
+• Channel Mix: [Email primary, consider + Slack/LinkedIn for high-value]
+
+AUDIENCE SEGMENTATION
+• Segment 1: [Criteria] - [Messaging approach]
+• Segment 2: [Criteria] - [Messaging approach]
+• Segment 3: [Criteria] - [Messaging approach]
+
+CONTENT STRATEGY
+Phase 1 - Awareness: [Educational content, thought leadership]
+Phase 2 - Consideration: [Solution content, case studies]
+Phase 3 - Engagement: [Product content, demos, trials]
+
+SUCCESS METRICS
+• Primary: Engaged web sessions, MQL rate
+• Secondary: Open rate 12-15%, CTR 1.5-2.5%
+• North Star: Lead-to-MQL conversion improvement
+
+PERSONALIZATION TACTICS
+• Dynamic content by [persona/industry/company size]
+• Behavioral triggers: [engaged sessions, content downloads]
+• Lead scoring adjustments based on engagement
+
+TESTING ROADMAP
+• Month 1: Subject line testing
+• Month 2: CTA testing
+• Month 3: Content format testing
+
+---
+💡 STRATEGIC FRAMEWORK - Adapt to your specific context`;
+        }
+
+        function generateAudienceSegmentation(context, projectContext, personaContext) {
+            return `AUDIENCE SEGMENTATION STRATEGY
+
+${context}
+
+SEGMENTATION DIMENSIONS
+1. Persona/Role: [CX, IT, HR, etc.]
+2. Engagement Level: [Hot/Warm/Cold based on activity]
+3. Lifecycle Stage: [Prospect/MQL/Re-engage]
+4. Company Profile: [Enterprise/Commercial/SMB/Digital]
+
+RECOMMENDED SEGMENTS
+
+Segment A: [High-Value Engaged]
+• Criteria: [Engagement score >X, Enterprise, Key persona]
+• Size: [Estimate]
+• Messaging: [Product-focused, demo-driven]
+• Cadence: [Higher frequency]
+
+Segment B: [Mid-Funnel Prospects]
+• Criteria: [Some engagement, target persona, qualified]
+• Size: [Estimate]
+• Messaging: [Solution education, case studies]
+• Cadence: [Standard frequency]
+
+Segment C: [Cold/Dormant]
+• Criteria: [No activity >90 days, valid email]
+• Size: [Estimate]
+• Messaging: [Re-engagement, new value props]
+• Cadence: [Lower frequency, reactivation series]
+
+PERSONALIZATION BY SEGMENT
+• Subject lines: [Adapt urgency/value prop by segment]
+• Content: [Match to lifecycle stage and engagement]
+• CTAs: [Progressive from soft to direct]
+
+MEASUREMENT PLAN
+• Track segment performance separately
+• Compare engagement rates across segments
+• Identify which segments convert best
+• Optimize resource allocation
+
+---
+💡 SEGMENTATION FRAMEWORK - Refine based on data`;
+        }
+
+        function generateResultsAnalysis(context, projectContext, personaContext) {
+            return `CAMPAIGN PERFORMANCE ANALYSIS
+
+${context}
+
+KEY METRICS vs. BENCHMARKS
+• Sends: [X]
+• Open Rate: [X%] (Benchmark: 12-15%)
+• Click Rate: [X%] (Benchmark: 1.5-2.5%)
+• Engaged Sessions: [X] (North Star metric)
+• MQLs Generated: [X]
+• Pipeline Impact: $[X]
+
+WHAT WORKED WELL ✅
+1. [Success factor 1] - [Evidence/data]
+2. [Success factor 2] - [Evidence/data]
+3. [Success factor 3] - [Evidence/data]
+
+AREAS FOR IMPROVEMENT ⚠️
+1. [Opportunity 1] - [Data supporting]
+2. [Opportunity 2] - [Data supporting]
+3. [Opportunity 3] - [Data supporting]
+
+KEY LEARNINGS
+• [Learning 1 - What we discovered]
+• [Learning 2 - What surprised us]
+• [Learning 3 - What we validated]
+
+SEGMENT PERFORMANCE
+[If applicable - break down by persona/region/segment]
+
+RECOMMENDATIONS FOR NEXT CAMPAIGN
+1. [Recommendation 1] - [Rationale]
+2. [Recommendation 2] - [Rationale]
+3. [Recommendation 3] - [Rationale]
+
+---
+💡 ANALYSIS DRAFT - Add specific numbers and context`;
+        }
+
+        function generateABTest(context, projectContext, personaContext) {
+            return `A/B TEST PLAN
+
+${context}
+
+TEST HYPOTHESIS
+• We believe that [variant B] will [improve metric] because [rationale]
+
+TEST VARIANTS
+Variant A (Control): [Description]
+Variant B (Test): [Description]
+
+WHAT WE'RE TESTING
+• Element: [Subject line / CTA / Content / Send time]
+• Variables: [Specific differences]
+
+SAMPLE SIZE & SPLIT
+• Total audience: [X]
+• Split: 50/50 (A: [X] | B: [X])
+• Statistical significance target: 95% confidence
+
+SUCCESS METRICS
+• Primary: [e.g., Open rate, CTR, Engaged sessions]
+• Secondary: [Supporting metrics]
+• Minimum detectable difference: [X%]
+
+TEST DURATION
+• Launch: [Date]
+• Results review: [Date - allow at least 3-5 days]
+• Winner rollout: [Date]
+
+DECISION CRITERIA
+• Winner needs [X%] improvement + statistical significance
+• If no clear winner: [Default to control / Test further]
+
+ROLLOUT PLAN
+• Winner goes to remaining [X%] of audience
+• Document results for future campaigns
+• Apply learning to similar campaigns
+
+RISKS & MITIGATION
+• Risk: [e.g., Small sample size] - Mitigation: [Solution]
+• Risk: [e.g., External factors] - Mitigation: [Solution]
+
+---
+💡 TEST PLAN - Ensure sample size is adequate for significance`;
+        }
+
+        function generateSubjectLinesContent(context, projectContext, personaContext) {
+            const contextText = context || 'your email';
+            return `1. [Value-focused]: Get [specific benefit] in [timeframe]
+2. [Curiosity]: The [#] [surprising thing] about [topic]
+3. [Question]: Are you [pain point/challenge]?
+4. [Urgency]: [Action] before [deadline/event]
+5. [Social proof]: How [customer type] achieved [result]
+
+💡 Test multiple approaches - value, curiosity, urgency perform differently by audience`;
+        }
+
+        // Strategy brainstorming
+        function generateStrategy() {
+            const topic = document.getElementById('strategy-topic').value;
+            const context = document.getElementById('strategy-context').value;
+
+            if (!topic || !context) {
+                alert('Please select a topic and describe your situation.');
+                return;
+            }
+
+            const strategies = {
+                'nurture-program': generateNurtureStrategy,
+                'cold-lead-reactivation': generateColdLeadStrategy,
+                'audience-segmentation': generateAudienceSegmentation,
+                'lead-scoring': generateLeadScoringStrategy,
+                'email-cadence': generateEmailCadenceStrategy,
+                'content-strategy': generateContentStrategy,
+                'metrics-kpis': generateMetricsStrategy,
+                'ab-testing': generateABTestStrategy,
+                'program-optimization': generateOptimizationStrategy,
+                'persona-nurture': generatePersonaNurtureStrategy
+            };
+
+            const generator = strategies[topic] || generateGenericStrategy;
+            const output = generator(context);
+
+            document.getElementById('strategy-text').textContent = output;
+            document.getElementById('strategy-output').style.display = 'block';
+            document.getElementById('strategy-output').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function generateColdLeadStrategy(context) {
+            return `COLD LEAD REACTIVATION STRATEGY
+
+SITUATION: ${context}
+
+RECOMMENDED APPROACH
+
+PHASE 1: RE-ENGAGEMENT (Weeks 1-2)
+• Goal: Recapture attention with new value
+• Tactics:
+  - Fresh messaging focused on recent product updates/new capabilities
+  - "What's new" or "You've been missed" angle
+  - Low-friction CTA (read, watch, explore)
+
+PHASE 2: EDUCATION (Weeks 3-4)
+• Goal: Rebuild interest through education
+• Tactics:
+  - Industry insights and trends relevant to their role
+  - Customer success stories from similar companies
+  - Educational content (guides, webinars, case studies)
+
+PHASE 3: ACTIVATION (Weeks 5-6)
+• Goal: Drive meaningful engagement
+• Tactics:
+  - Product-focused content (demos, trials, assessments)
+  - Personalized outreach for engaged leads
+  - Clear conversion path
+
+SEGMENTATION STRATEGY
+• Segment by last activity date: 90-180 days, 180+ days
+• Segment by original interest/persona
+• Different messaging by segment
+
+EMAIL CADENCE
+• Week 1: Email 1 (Re-introduction)
+• Week 2: Email 2 (Value/What's new)
+• Week 3: Email 3 (Educational)
+• Week 4: Email 4 (Social proof)
+• Week 5: Email 5 (Product/Demo)
+• Week 6: Email 6 (Final CTA)
+
+SUCCESS METRICS
+• Re-engagement rate: 3-5% of cold leads
+• Engaged sessions from campaign
+• MQL reactivation rate
+• Pipeline contribution
+
+OPTIMIZATION TACTICS
+• Test subject lines for reactivation messaging
+• A/B test incentives vs. value-first approach
+• Monitor unsubscribe rates (stop if >2%)
+
+---
+💡 Reactivation campaigns work best when you lead with NEW value`;
+        }
+
+        function generateLeadScoringStrategy(context) {
+            return `LEAD SCORING MODEL RECOMMENDATION
+
+${context}
+
+BEHAVIORAL SCORING (Total: 100 points)
+
+Email Engagement:
+• Email open: +2 points
+• Email click: +5 points
+• Multiple clicks in one email: +8 points
+
+Website Engagement:
+• Visit any page: +3 points
+• Engaged session (10s+, 2+ pages): +10 points
+• Pricing page visit: +15 points
+• Demo/Trial page visit: +20 points
+
+Content Engagement:
+• Download asset: +10 points
+• Attend webinar: +15 points
+• View product page: +12 points
+• Case study view: +10 points
+
+DEMOGRAPHIC SCORING (Total: 50 points)
+
+Company Fit:
+• Target industry: +10 points
+• Target company size: +10 points
+• Target region: +5 points
+
+Role Fit:
+• Decision maker role: +15 points
+• Influencer role: +10 points
+
+SCORING THRESHOLDS
+• MQL: 60+ points
+• Hot Lead: 80+ points
+• Need nurture: <60 points
+
+DECAY RULES
+• -5 points per week of inactivity
+• Reset to base if no activity in 90 days
+
+ACTIONS BY SCORE
+• 80+: Sales outreach
+• 60-79: MQL, sales queue
+• 40-59: Targeted nurture
+• <40: Standard nurture
+
+---
+💡 Refine thresholds based on conversion data`;
+        }
+
+        function generateEmailCadenceStrategy(context) {
+            return `EMAIL CADENCE & FREQUENCY STRATEGY
+
+${context}
+
+RECOMMENDED APPROACH
+
+Standard Nurture Cadence:
+• Frequency: 1 email per week (Wednesday 10am local time)
+• Volume: Respects global limits (2/day, 5/week max)
+• Duration: Evergreen until MQL or opt-out
+
+High-Intent Cadence:
+• Frequency: 2-3 emails per week
+• Audience: Engaged leads, event attendees, demo requests
+• Duration: 2-4 week sprint, then to standard
+
+Cold Lead Reactivation:
+• Frequency: 1 email every 4-5 days
+• Duration: 6-email series over 3-4 weeks
+• Then pause or move to standard cadence
+
+SEND TIME OPTIMIZATION
+• Best days: Tuesday-Thursday
+• Best times: 10am-11am local time
+• Avoid: Monday mornings, Friday afternoons, weekends
+
+FREQUENCY MANAGEMENT
+• Respect unsubscribe preferences
+• Monitor engagement by frequency
+• Reduce frequency if engagement drops
+• Pause if unsubscribe rate >2%
+
+A/B TESTING PRIORITIES
+1. Day of week (Wed vs Tue vs Thu)
+2. Time of day (10am vs 2pm)
+3. Frequency (weekly vs biweekly for cold leads)
+
+---
+💡 Balance presence with respect - consistency builds trust`;
+        }
+
+        function generateContentStrategy(context) {
+            return `CONTENT STRATEGY FOR LIFECYCLE STAGE
+
+${context}
+
+CONTENT MAPPING BY STAGE
+
+AWARENESS Stage (Top of Funnel):
+Goal: Education & problem identification
+Content Types:
+• Blog posts on industry trends
+• Educational guides/ebooks
+• Thought leadership pieces
+• Webinars on challenges/solutions
+Tone: Educational, helpful, not salesy
+
+CONSIDERATION Stage (Mid Funnel):
+Goal: Solution education & differentiation
+Content Types:
+• Case studies showing results
+• Product comparison guides
+• Solution briefs
+• Demo videos
+• ROI calculators
+Tone: Solution-focused, proof-driven
+
+DECISION Stage (Bottom Funnel):
+Goal: Remove friction & drive conversion
+Content Types:
+• Customer testimonials
+• Implementation guides
+• Pricing/packaging info
+• Trial offers
+• Analyst reports
+Tone: Direct, confidence-building
+
+CONTENT MIX BY PERSONA
+CX Persona: Customer service challenges, AI adoption, efficiency
+IT Persona: Technical specs, security, integrations, scalability
+HR Persona: Employee experience, helpdesk, self-service
+
+CONTENT REFRESH CADENCE
+• Rotate content monthly
+• Test new content formats quarterly
+• Retire low-performing content
+
+---
+💡 Match content to where they are in journey`;
+        }
+
+        function generateMetricsStrategy(context) {
+            return `METRICS & KPI FRAMEWORK
+
+${context}
+
+NORTH STAR METRIC
+🎯 Engaged Web Sessions
+• Definition: 10+ seconds, 2+ pages, OR key event
+• Why: Best predictor of downstream conversion
+• Target: [X per month]
+
+TIER 1 METRICS (Program Health)
+• Lead-to-MQL rate: Target 12-15%
+• Email engagement rate: Opens 12-15%, CTR 1.5-2.5%
+• Re-engagement rate: Cold leads activating
+• MQL quality: MQL-to-S2 conversion
+
+TIER 2 METRICS (Tactical)
+• Send volume & deliverability
+• Unsubscribe rate (<2%)
+• Campaign-level performance
+• Segment performance comparison
+
+TIER 3 METRICS (Leading Indicators)
+• Email opens (directional only)
+• Click patterns
+• Content engagement
+• Time on site
+
+BUSINESS IMPACT METRICS
+• Pipeline contribution
+• Revenue attribution
+• CAC efficiency
+• Customer LTV from nurtured leads
+
+REPORTING CADENCE
+• Weekly: Send volume, engagement rates
+• Monthly: MQL contribution, program health
+• Quarterly: Business impact, optimization plans
+
+DASHBOARD REQUIREMENTS
+• Real-time: Deliverability, sends
+• Weekly refresh: Engagement metrics
+• Monthly: Conversion and pipeline
+
+---
+💡 Focus on outcomes (MQLs, Pipeline) not just activity (sends, opens)`;
+        }
+
+        function generateABTestStrategy(context) {
+            return `A/B TESTING ROADMAP
+
+${context}
+
+TESTING PRIORITIES
+
+Q1: FOUNDATIONAL TESTS
+1. Subject line approaches (value vs curiosity vs question)
+2. Send day (Tue vs Wed vs Thu)
+3. From name (personal vs company)
+
+Q2: CONTENT TESTS
+4. Email length (short vs detailed)
+5. CTA placement (top vs bottom vs both)
+6. Content format (text vs visual)
+
+Q3: PERSONALIZATION TESTS
+7. Dynamic content by persona
+8. Company-size personalization
+9. Behavioral triggers
+
+Q4: ADVANCED TESTS
+10. Send time optimization
+11. Multi-variate content combinations
+12. Progressive profiling in nurture
+
+TESTING BEST PRACTICES
+• One variable at a time
+• Minimum 3-5 days test duration
+• Statistical significance required (95% confidence)
+• Document all learnings
+• Apply winners systematically
+
+SAMPLE SIZE CALCULATOR
+• Need ~1,000 per variant minimum
+• Larger for smaller expected differences
+• Consider baseline conversion rates
+
+WINNER CRITERIA
+• Statistical significance achieved
+• Lift >10% on primary metric
+• No negative impact on secondary metrics
+
+---
+💡 Test systematically - learning compounds over time`;
+        }
+
+        function generateOptimizationStrategy(context) {
+            return `PROGRAM OPTIMIZATION RECOMMENDATIONS
+
+${context}
+
+OPTIMIZATION FRAMEWORK
+
+1. AUDIENCE REFINEMENT
+Current State: [Analyze current targeting]
+Opportunities:
+• Segment by engagement level
+• Exclude recently converted
+• Add firmographic filters
+• Test lookalike audiences
+
+2. CONTENT OPTIMIZATION
+Current State: [Review content performance]
+Opportunities:
+• Refresh underperforming emails
+• Test new content formats
+• Personalize by segment
+• Update CTAs for clarity
+
+3. CADENCE & TIMING
+Current State: [Review frequency and timing]
+Opportunities:
+• Test send day/time
+• Adjust frequency by engagement
+• Implement behavior-triggered sends
+• Add re-engagement series
+
+4. CONVERSION PATH
+Current State: [Analyze drop-off points]
+Opportunities:
+• Simplify landing pages
+• Reduce form friction
+• Add social proof
+• Test different CTAs
+
+5. MEASUREMENT & REPORTING
+Current State: [Review current tracking]
+Opportunities:
+• Implement better attribution
+• Track engaged sessions
+• Build cohort analysis
+• Create segment dashboards
+
+QUICK WINS (This Month)
+1. [Highest impact, lowest effort]
+2. [Second priority]
+3. [Third priority]
+
+LONGER-TERM INITIATIVES (Next Quarter)
+1. [Strategic improvements]
+2. [Platform/process changes]
+
+---
+💡 Start with data - what's working, what's not?`;
+        }
+
+        function generatePersonaNurtureStrategy(context) {
+            return `PERSONA-BASED NURTURE STRATEGY
+
+${context}
+
+PERSONA TRACK APPROACH
+
+CX PERSONA Track
+Pain Points: Volume spikes, AI adoption, agent efficiency
+Messaging Focus:
+• Customer service transformation
+• AI-powered automation
+• Efficiency and cost savings
+Content Mix: CX case studies, AI guides, efficiency calculators
+
+IT PERSONA Track
+Pain Points: Security, scalability, integrations, TCO
+Messaging Focus:
+• Enterprise-grade platform
+• Security & compliance
+• Integration ecosystem
+Content Mix: Technical docs, security whitepapers, integration guides
+
+HR PERSONA Track
+Pain Points: Employee experience, ticket deflection, self-service
+Messaging Focus:
+• Employee service delivery
+• Internal helpdesk automation
+• Self-service portals
+Content Mix: HR case studies, ESM guides, ROI calculators
+
+CROSS-PERSONA STRATEGY
+• Start with role-agnostic welcome series
+• Branch to persona tracks after engagement signal
+• Include cross-sell content for multi-persona buying committees
+
+PERSONALIZATION TACTICS
+• Subject lines by pain point
+• Dynamic content blocks by persona
+• Persona-specific CTAs and resources
+
+PERFORMANCE BY PERSONA
+• Track separately: open rates, CTR, engaged sessions, MQL rate
+• Compare to identify highest-performing personas
+• Optimize resource allocation
+
+---
+💡 Persona relevance drives engagement - speak their language`;
+        }
+
+        function generateGenericStrategy(context) {
+            return `STRATEGIC RECOMMENDATIONS
+
+${context}
+
+KEY CONSIDERATIONS
+• Current state assessment
+• Goal definition and success criteria
+• Audience and segmentation approach
+• Resource requirements
+• Timeline and milestones
+• Risk factors and mitigation
+
+RECOMMENDED APPROACH
+[Based on your context, consider:]
+
+1. [Recommendation 1]
+   - Rationale: [Why this matters]
+   - Tactics: [How to execute]
+   - Success metrics: [How to measure]
+
+2. [Recommendation 2]
+   - Rationale: [Why this matters]
+   - Tactics: [How to execute]
+   - Success metrics: [How to measure]
+
+3. [Recommendation 3]
+   - Rationale: [Why this matters]
+   - Tactics: [How to execute]
+   - Success metrics: [How to measure]
+
+NEXT STEPS
+• [Immediate action 1]
+• [Immediate action 2]
+• [Follow-up action]
+
+---
+💡 Refine strategy based on your specific situation`;
+        }
+
+        function copyStrategyOutput() {
+            const content = document.getElementById('strategy-text').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('✅ Strategy copied to clipboard!');
+            });
+        }
+
+        // Quick marketing tools
+        function generateSubjectLines() {
+            const context = document.getElementById('subject-context').value;
+            if (!context) {
+                alert('Please describe what the email is about.');
+                return;
+            }
+
+            const output = generateSubjectLinesContent(context);
+            document.getElementById('subject-text').innerHTML = output.replace(/\n/g, '<br>');
+            document.getElementById('subject-output').style.display = 'block';
+        }
+
+        function generateCTAs() {
+            const context = document.getElementById('cta-context').value;
+            if (!context) {
+                alert('Please describe the desired action.');
+                return;
+            }
+
+            const output = `Primary CTAs:
+• ${context.charAt(0).toUpperCase() + context.slice(1)} →
+• Get Started with ${context}
+• ${context} Now
+
+Secondary CTAs:
+• Learn More About ${context}
+• See How It Works
+• Explore ${context}
+
+Soft CTAs:
+• I'm curious about ${context}
+• Tell me more
+• Quick question about ${context}
+
+💡 Test urgent vs. value-focused CTAs`;
+
+            document.getElementById('cta-text').innerHTML = output.replace(/\n/g, '<br>');
+            document.getElementById('cta-output').style.display = 'block';
+        }
+
+        function generateCampaignNames() {
+            const context = document.getElementById('campaign-context').value;
+            if (!context) {
+                alert('Please describe the campaign.');
+                return;
+            }
+
+            const output = `Internal Campaign Names:
+• ${context} - [Quarter] [Year]
+• [Persona/Segment] ${context} Program
+• ${context} Nurture Initiative
+
+Email Program Names (visible to recipients):
+• [Value-focused name related to outcome]
+• [Problem/solution name]
+• [Educational series name]
+
+UTM Campaign Naming:
+• ${context.toLowerCase().replace(/\s+/g, '-')}-q[X]-[year]
+• [segment]-${context.toLowerCase().replace(/\s+/g, '-')}
+
+💡 Keep internal names descriptive, external names aspirational`;
+
+            document.getElementById('campaign-name-text').innerHTML = output.replace(/\n/g, '<br>');
+            document.getElementById('campaign-name-output').style.display = 'block';
         }
     </script>
 </body>
