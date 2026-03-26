@@ -1211,6 +1211,7 @@
             <button class="nav-button" onclick="switchView('history-archive')">History Archive</button>
             <button class="nav-button" onclick="switchView('career-growth')">Career Growth</button>
             <button class="nav-button" onclick="switchView('brag-book')">Brag Book</button>
+            <button class="nav-button" onclick="switchView('digital-twin')">Digital Twin</button>
         </nav>
 
         <div id="dashboard-view">
@@ -1549,6 +1550,146 @@
                 </div>
             </div>
         </div>
+
+        <!-- Digital Twin View -->
+        <div id="digital-twin-view" class="hidden">
+            <header>
+                <h1>🤖 Digital Twin</h1>
+                <p class="subtitle">Your AI writing assistant trained on your tone, expertise, and communication style</p>
+            </header>
+
+            <div class="executive-summary">
+                <h2>👤 Your Persona</h2>
+                <p style="color: #64748b; margin-bottom: 20px;">Define your unique voice, expertise, and communication style to personalize your AI assistant.</p>
+
+                <div style="display: grid; gap: 16px;">
+                    <div class="form-group">
+                        <label for="persona-name" style="font-weight: 700; margin-bottom: 8px; display: block;">Your Name</label>
+                        <input type="text" id="persona-name" placeholder="e.g., Karyn Thompson" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="persona-role" style="font-weight: 700; margin-bottom: 8px; display: block;">Your Role/Title</label>
+                        <input type="text" id="persona-role" placeholder="e.g., Lifecycle Marketing Manager" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="persona-expertise" style="font-weight: 700; margin-bottom: 8px; display: block;">Areas of Expertise (comma-separated)</label>
+                        <textarea id="persona-expertise" rows="3" placeholder="e.g., Lifecycle Marketing, Email Nurture Programs, Lead Scoring, Marketing Automation, Partner Programs" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="persona-tone" style="font-weight: 700; margin-bottom: 8px; display: block;">Communication Style/Tone</label>
+                        <textarea id="persona-tone" rows="4" placeholder="Describe how you write and communicate. e.g., Direct and concise, data-driven, strategic thinker, collaborative, focuses on business impact..." style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="persona-preferences" style="font-weight: 700; margin-bottom: 8px; display: block;">Writing Preferences</label>
+                        <textarea id="persona-preferences" rows="4" placeholder="How do you like to structure your communication? e.g., Start with the bottom line, use bullet points, include metrics, keep it brief..." style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="persona-audience" style="font-weight: 700; margin-bottom: 8px; display: block;">Typical Audiences</label>
+                        <input type="text" id="persona-audience" placeholder="e.g., Leadership team, cross-functional partners, regional teams" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;">
+                    </div>
+
+                    <button onclick="savePersona()" style="margin-top: 12px;">💾 Save Persona</button>
+                </div>
+            </div>
+
+            <div class="executive-summary">
+                <h2>✍️ Content Generator</h2>
+                <p style="color: #64748b; margin-bottom: 20px;">Get past the blank page with AI-generated content starters in your voice.</p>
+
+                <div style="display: grid; gap: 16px;">
+                    <div class="form-group">
+                        <label for="content-type" style="font-weight: 700; margin-bottom: 8px; display: block;">What do you need help with?</label>
+                        <select id="content-type" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;">
+                            <option value="">Select a type...</option>
+                            <option value="email">Email</option>
+                            <option value="slack">Slack Message</option>
+                            <option value="brief">Campaign Brief</option>
+                            <option value="update">Status Update</option>
+                            <option value="presentation">Presentation Outline</option>
+                            <option value="summary">Executive Summary</option>
+                            <option value="plan">Project Plan</option>
+                            <option value="feedback">Feedback/Review</option>
+                            <option value="custom">Custom</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content-context" style="font-weight: 700; margin-bottom: 8px; display: block;">Context/What's it about?</label>
+                        <textarea id="content-context" rows="4" placeholder="Describe what you need to write. Include key points, audience, purpose, and any important details..." style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;"></textarea>
+                    </div>
+
+                    <div class="form-group" id="project-context-group">
+                        <label for="content-project" style="font-weight: 700; margin-bottom: 8px; display: block;">Related Project (optional)</label>
+                        <select id="content-project" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;">
+                            <option value="">None - or select for context</option>
+                        </select>
+                    </div>
+
+                    <button onclick="generateContent()" style="margin-top: 12px;">✨ Generate Draft in My Voice</button>
+                </div>
+
+                <div id="generated-content" style="display: none; margin-top: 24px;">
+                    <div style="background: white; padding: 24px; border-radius: 12px; border: 2px solid #A1D78F;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="font-size: 18px; margin: 0;">Generated Draft</h3>
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="copyGeneratedContent()" class="secondary" style="padding: 8px 16px; font-size: 14px;">📋 Copy</button>
+                                <button onclick="refineContent()" class="secondary" style="padding: 8px 16px; font-size: 14px;">🔄 Refine</button>
+                            </div>
+                        </div>
+                        <div id="generated-text" style="white-space: pre-wrap; line-height: 1.8; color: #11110D; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="executive-summary">
+                <h2>📚 Quick Templates</h2>
+                <p style="color: #64748b; margin-bottom: 20px;">Pre-built templates in your voice for common scenarios.</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;">
+                    <div onclick="loadTemplate('campaign-kickoff')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🚀</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Campaign Kickoff</h4>
+                        <p style="font-size: 14px; color: #64748b;">Launch announcement email</p>
+                    </div>
+
+                    <div onclick="loadTemplate('status-update')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📊</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Status Update</h4>
+                        <p style="font-size: 14px; color: #64748b;">Project progress report</p>
+                    </div>
+
+                    <div onclick="loadTemplate('stakeholder-request')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📝</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Stakeholder Request</h4>
+                        <p style="font-size: 14px; color: #64748b;">Ask for input or approval</p>
+                    </div>
+
+                    <div onclick="loadTemplate('program-brief')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📋</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Program Brief</h4>
+                        <p style="font-size: 14px; color: #64748b;">Campaign overview doc</p>
+                    </div>
+
+                    <div onclick="loadTemplate('results-summary')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📈</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Results Summary</h4>
+                        <p style="font-size: 14px; color: #64748b;">Post-campaign analysis</p>
+                    </div>
+
+                    <div onclick="loadTemplate('meeting-agenda')" style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.borderColor='#A1D78F'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📅</div>
+                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Meeting Agenda</h4>
+                        <p style="font-size: 14px; color: #64748b;">Structured meeting outline</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Project Modal -->
@@ -1759,6 +1900,7 @@ Dashboard: https://..."></textarea>
         // Data storage
         let projects = [];
         let bragBook = [];
+        let persona = {};
         let currentProjectId = null;
         let editingProjectId = null;
         let editingBragId = null;
@@ -1790,12 +1932,17 @@ Dashboard: https://..."></textarea>
             if (storedBrag) {
                 bragBook = JSON.parse(storedBrag);
             }
+            const storedPersona = localStorage.getItem('persona');
+            if (storedPersona) {
+                persona = JSON.parse(storedPersona);
+            }
         }
 
         // Save projects to localStorage
         function saveProjects() {
             localStorage.setItem('projects', JSON.stringify(projects));
             localStorage.setItem('bragBook', JSON.stringify(bragBook));
+            localStorage.setItem('persona', JSON.stringify(persona));
         }
 
         // Alias for compatibility
@@ -2233,6 +2380,7 @@ Dashboard: https://..."></textarea>
             document.getElementById('history-archive-view').classList.add('hidden');
             document.getElementById('career-growth-view').classList.add('hidden');
             document.getElementById('brag-book-view').classList.add('hidden');
+            document.getElementById('digital-twin-view').classList.add('hidden');
 
             // Update nav buttons
             document.querySelectorAll('.nav-button').forEach(btn => {
@@ -2255,6 +2403,10 @@ Dashboard: https://..."></textarea>
                 document.getElementById('brag-book-view').classList.remove('hidden');
                 document.querySelectorAll('.nav-button')[3].classList.add('active');
                 renderBragBook();
+            } else if (view === 'digital-twin') {
+                document.getElementById('digital-twin-view').classList.remove('hidden');
+                document.querySelectorAll('.nav-button')[4].classList.add('active');
+                renderDigitalTwin();
             } else if (view === 'detail') {
                 document.getElementById('detail-view').classList.remove('hidden');
             }
@@ -3200,6 +3352,434 @@ Dashboard: https://..."></textarea>
             a.download = `brag-book-${new Date().toISOString().split('T')[0]}.txt`;
             a.click();
             URL.revokeObjectURL(url);
+        }
+
+        // Digital Twin Functions
+        function renderDigitalTwin() {
+            // Load persona data into form
+            document.getElementById('persona-name').value = persona.name || '';
+            document.getElementById('persona-role').value = persona.role || '';
+            document.getElementById('persona-expertise').value = persona.expertise || '';
+            document.getElementById('persona-tone').value = persona.tone || '';
+            document.getElementById('persona-preferences').value = persona.preferences || '';
+            document.getElementById('persona-audience').value = persona.audience || '';
+
+            // Populate project dropdown
+            const projectSelect = document.getElementById('content-project');
+            projectSelect.innerHTML = '<option value="">None - or select for context</option>';
+            projects.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = p.name;
+                projectSelect.appendChild(option);
+            });
+        }
+
+        function savePersona() {
+            persona = {
+                name: document.getElementById('persona-name').value,
+                role: document.getElementById('persona-role').value,
+                expertise: document.getElementById('persona-expertise').value,
+                tone: document.getElementById('persona-tone').value,
+                preferences: document.getElementById('persona-preferences').value,
+                audience: document.getElementById('persona-audience').value,
+                updatedAt: new Date().toISOString()
+            };
+
+            saveData();
+            alert('✅ Persona saved! Your Digital Twin is now ready to help you write.');
+        }
+
+        function generateContent() {
+            const contentType = document.getElementById('content-type').value;
+            const context = document.getElementById('content-context').value;
+            const projectId = document.getElementById('content-project').value;
+
+            if (!contentType || !context) {
+                alert('Please select a content type and provide context.');
+                return;
+            }
+
+            if (!persona.name) {
+                alert('Please save your persona first to generate content in your voice.');
+                return;
+            }
+
+            // Get project context if selected
+            let projectContext = '';
+            if (projectId) {
+                const project = projects.find(p => p.id === projectId);
+                if (project) {
+                    projectContext = `\n\nProject Context:\n- Project: ${project.name}\n- Status: ${project.status}\n- Overview: ${project.tldr || project.executiveSummary}`;
+                    if (project.okr) projectContext += `\n- OKR: ${project.okr.split('\n')[0]}`;
+                }
+            }
+
+            // Generate content based on persona and context
+            const generated = generateDraftContent(contentType, context, projectContext);
+
+            document.getElementById('generated-text').textContent = generated;
+            document.getElementById('generated-content').style.display = 'block';
+
+            // Scroll to result
+            document.getElementById('generated-content').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function generateDraftContent(type, context, projectContext) {
+            // Build persona context
+            const personaContext = `Writing as: ${persona.name}, ${persona.role}
+Expertise: ${persona.expertise}
+Communication Style: ${persona.tone}
+Writing Preferences: ${persona.preferences}
+Audience: ${persona.audience}`;
+
+            // Template generators based on type
+            const templates = {
+                'email': generateEmail,
+                'slack': generateSlack,
+                'brief': generateBrief,
+                'update': generateUpdate,
+                'presentation': generatePresentation,
+                'summary': generateSummary,
+                'plan': generatePlan,
+                'feedback': generateFeedback,
+                'custom': generateCustom
+            };
+
+            const generator = templates[type] || generateCustom;
+            return generator(context, projectContext, personaContext);
+        }
+
+        function generateEmail(context, projectContext, personaContext) {
+            return `Subject: [Your Subject Here]
+
+Hi [Name],
+
+[Opening - State the purpose directly]
+
+${context}
+
+${projectContext ? '\nRelated to: ' + projectContext.split('Project: ')[1].split('\n')[0] : ''}
+
+[Key points or action items]
+• Point 1
+• Point 2
+• Point 3
+
+[Next steps or call to action]
+
+Let me know if you have questions.
+
+Best,
+${persona.name || '[Your Name]'}
+
+---
+💡 AI-GENERATED DRAFT - Review and personalize before sending`;
+        }
+
+        function generateSlack(context, projectContext, personaContext) {
+            return `${context}
+
+Key points:
+• [Point 1]
+• [Point 2]
+• [Point 3]
+
+${projectContext ? 'Related project: ' + projectContext.split('Project: ')[1].split('\n')[0] : ''}
+
+[Next steps or questions]
+
+---
+💡 AI-GENERATED DRAFT - Customize before sending`;
+        }
+
+        function generateBrief(context, projectContext, personaContext) {
+            return `CAMPAIGN/PROGRAM BRIEF
+
+📋 OVERVIEW
+${context}
+
+🎯 OBJECTIVES
+• Objective 1
+• Objective 2
+• Objective 3
+
+👥 AUDIENCE
+[Define target audience]
+
+📊 SUCCESS METRICS
+• Metric 1: [target]
+• Metric 2: [target]
+• Metric 3: [target]
+
+📅 TIMELINE
+• Phase 1: [dates]
+• Phase 2: [dates]
+• Launch: [date]
+
+🔗 STRATEGIC ALIGNMENT
+${projectContext || '[Link to OKRs and company priorities]'}
+
+⚠️ RISKS & DEPENDENCIES
+• [Risk/dependency 1]
+• [Risk/dependency 2]
+
+👤 STAKEHOLDERS
+• Owner: ${persona.name}
+• [Other stakeholders]
+
+---
+💡 AI-GENERATED DRAFT - Customize with specific details`;
+        }
+
+        function generateUpdate(context, projectContext, personaContext) {
+            return `PROJECT UPDATE
+
+${projectContext ? projectContext.split('Project: ')[1].split('\n')[0] : '[Project Name]'}
+
+📊 STATUS
+${context}
+
+✅ COMPLETED
+• [Accomplishment 1]
+• [Accomplishment 2]
+
+🔄 IN PROGRESS
+• [Current work 1]
+• [Current work 2]
+
+📅 UPCOMING
+• [Next milestone 1]
+• [Next milestone 2]
+
+⚠️ BLOCKERS / NEEDS
+[Any blockers or help needed]
+
+📈 IMPACT TO DATE
+[Metrics or early results if available]
+
+---
+💡 AI-GENERATED DRAFT - Add specific metrics and details`;
+        }
+
+        function generatePresentation(context, projectContext, personaContext) {
+            return `PRESENTATION OUTLINE
+
+TITLE: [Your Title]
+${projectContext ? 'Topic: ' + projectContext.split('Project: ')[1].split('\n')[0] : ''}
+
+SLIDE 1: TITLE
+• [Your name, role]
+• [Date]
+
+SLIDE 2: AGENDA
+1. Background/Context
+2. Key Points
+3. Recommendations
+4. Next Steps
+
+SLIDE 3: EXECUTIVE SUMMARY
+${context}
+
+SLIDE 4-6: KEY POINTS
+• Point 1: [Details]
+• Point 2: [Details]
+• Point 3: [Details]
+
+SLIDE 7: RECOMMENDATIONS
+1. [Recommendation 1]
+2. [Recommendation 2]
+3. [Recommendation 3]
+
+SLIDE 8: NEXT STEPS
+• [Action 1 - Owner - Date]
+• [Action 2 - Owner - Date]
+
+SLIDE 9: Q&A
+
+---
+💡 AI-GENERATED OUTLINE - Build out slides with visuals and data`;
+        }
+
+        function generateSummary(context, projectContext, personaContext) {
+            return `EXECUTIVE SUMMARY
+
+${projectContext ? projectContext.split('Project: ')[1].split('\n')[0] + '\n\n' : ''}OVERVIEW
+${context}
+
+KEY FINDINGS
+• [Finding 1]
+• [Finding 2]
+• [Finding 3]
+
+BUSINESS IMPACT
+• [Impact metric 1]
+• [Impact metric 2]
+• [Impact metric 3]
+
+RECOMMENDATIONS
+1. [Recommendation 1 with rationale]
+2. [Recommendation 2 with rationale]
+3. [Recommendation 3 with rationale]
+
+NEXT STEPS
+• [Action 1 - Owner - Timeline]
+• [Action 2 - Owner - Timeline]
+
+---
+💡 AI-GENERATED SUMMARY - Add specific data and metrics`;
+        }
+
+        function generatePlan(context, projectContext, personaContext) {
+            return `PROJECT PLAN
+
+${projectContext ? projectContext.split('Project: ')[1].split('\n')[0] + '\n\n' : ''}OBJECTIVE
+${context}
+
+SCOPE
+• In scope: [Item 1, Item 2, Item 3]
+• Out of scope: [Item 1, Item 2]
+
+PHASES
+Phase 1: Planning & Setup
+• [Task 1]
+• [Task 2]
+
+Phase 2: Execution
+• [Task 1]
+• [Task 2]
+
+Phase 3: Launch & Measurement
+• [Task 1]
+• [Task 2]
+
+TIMELINE
+• Start: [Date]
+• Milestones: [Dates]
+• Launch: [Date]
+
+RESOURCES NEEDED
+• [Resource 1]
+• [Resource 2]
+
+STAKEHOLDERS & ROLES
+• Owner: ${persona.name}
+• [Other roles]
+
+SUCCESS CRITERIA
+• [Metric 1]
+• [Metric 2]
+
+RISKS
+• [Risk 1 - Mitigation]
+• [Risk 2 - Mitigation]
+
+---
+💡 AI-GENERATED PLAN - Fill in specific dates and details`;
+        }
+
+        function generateFeedback(context, projectContext, personaContext) {
+            return `FEEDBACK
+
+Context: ${context}
+
+WHAT WENT WELL
+• [Positive 1]
+• [Positive 2]
+• [Positive 3]
+
+AREAS FOR IMPROVEMENT
+• [Improvement area 1]
+  Suggestion: [Specific suggestion]
+
+• [Improvement area 2]
+  Suggestion: [Specific suggestion]
+
+RECOMMENDATIONS
+1. [Actionable recommendation 1]
+2. [Actionable recommendation 2]
+
+OVERALL ASSESSMENT
+[Summary of feedback]
+
+---
+💡 AI-GENERATED FEEDBACK - Ensure tone is constructive and specific`;
+        }
+
+        function generateCustom(context, projectContext, personaContext) {
+            return `${context}
+
+${projectContext || ''}
+
+[Add your key points here]
+• Point 1
+• Point 2
+• Point 3
+
+[Next steps or conclusion]
+
+---
+Written by: ${persona.name}
+💡 AI-GENERATED DRAFT - Customize as needed`;
+        }
+
+        function copyGeneratedContent() {
+            const content = document.getElementById('generated-text').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('✅ Content copied to clipboard!');
+            });
+        }
+
+        function refineContent() {
+            const currentContent = document.getElementById('generated-text').textContent;
+            const additionalContext = prompt('What would you like to adjust? (e.g., "make it shorter", "add more metrics", "more casual tone")');
+
+            if (additionalContext) {
+                alert('Refinement feature coming soon! For now, copy the draft and manually edit it, or regenerate with updated context.');
+            }
+        }
+
+        function loadTemplate(templateType) {
+            const templates = {
+                'campaign-kickoff': {
+                    type: 'email',
+                    context: 'Announcing the launch of a new campaign to cross-functional stakeholders. Include: campaign name, target audience, key dates, what they need to do, and where to find more information.'
+                },
+                'status-update': {
+                    type: 'update',
+                    context: 'Weekly project status update for leadership covering: what was completed this week, what\'s in progress, upcoming milestones, any blockers or risks, and key metrics/progress toward goals.'
+                },
+                'stakeholder-request': {
+                    type: 'email',
+                    context: 'Requesting input or approval from stakeholders on a campaign plan. Include: background, what you need from them, timeline for response, and impact/rationale for the request.'
+                },
+                'program-brief': {
+                    type: 'brief',
+                    context: 'Comprehensive program brief for a new lifecycle marketing initiative including objectives, target audience, success metrics, timeline, and strategic alignment with company OKRs.'
+                },
+                'results-summary': {
+                    type: 'summary',
+                    context: 'Post-campaign results summary for leadership including: campaign overview, performance metrics vs goals, key learnings, and recommendations for future campaigns.'
+                },
+                'meeting-agenda': {
+                    type: 'custom',
+                    context: 'Meeting agenda for campaign planning session. Include: objectives, topics to cover, decisions needed, participants, and time allocations for each section.'
+                }
+            };
+
+            const template = templates[templateType];
+            if (template) {
+                document.getElementById('content-type').value = template.type;
+                document.getElementById('content-context').value = template.context;
+
+                // Scroll to generator
+                document.getElementById('content-type').scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Highlight the context field
+                setTimeout(() => {
+                    document.getElementById('content-context').focus();
+                }, 500);
+            }
         }
     </script>
 </body>
