@@ -1559,6 +1559,48 @@
             </header>
 
             <div class="executive-summary">
+                <h2>⚡ Quick Polish - Just Paste & Go</h2>
+                <p style="color: #64748b; margin-bottom: 20px;"><strong>Paste your rough notes, brain dump, or conversation summary.</strong> I'll figure out what you need and transform it into polished, Sr-level, friendly communication.</p>
+
+                <div style="display: grid; gap: 16px;">
+                    <div class="form-group">
+                        <label for="quick-polish-input" style="font-weight: 700; margin-bottom: 8px; display: block;">Paste Your Rough Notes/Brain Dump</label>
+                        <textarea id="quick-polish-input" rows="8" placeholder="Example:
+I spoke to paula about creating a recommendation where to add the New Biz CX Contact center emails
+And I plan to send Sheila a slack - and I need help to create a refined recommendation for her
+Placing the CC emails early in the Aware stage helps prime prospects to think about staffing and AI capabilities as foundational context before diving deeper into specific AI investment, tools, and tactics.
+I plan to place them within the first 5 emails on the nurture
+
+Just paste your notes - I'll handle the rest!" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;"></textarea>
+                    </div>
+
+                    <button onclick="quickPolish()" style="padding: 14px 28px; font-size: 16px;">✨ Polish This</button>
+                </div>
+
+                <div id="quick-polish-output" style="display: none; margin-top: 24px;">
+                    <div style="background: white; padding: 24px; border-radius: 12px; border: 2px solid #2D4C33;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="font-size: 18px; margin: 0;">Polished Output</h3>
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="copyQuickPolish()" class="secondary" style="padding: 8px 16px; font-size: 14px;">📋 Copy</button>
+                                <button onclick="refineQuickPolish()" class="secondary" style="padding: 8px 16px; font-size: 14px;">🔄 Refine</button>
+                            </div>
+                        </div>
+                        <div id="quick-polish-text" style="white-space: pre-wrap; line-height: 1.8; color: #11110D; font-size: 15px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;"></div>
+
+                        <div id="quick-polish-refine-panel" style="display: none; margin-top: 24px; padding-top: 24px; border-top: 2px solid #e2e8f0;">
+                            <h4 style="font-size: 16px; margin-bottom: 12px; font-weight: 700;">Refine This</h4>
+                            <textarea id="quick-polish-refine-instructions" rows="2" placeholder="What to adjust? (e.g., 'make it shorter', 'more casual', 'add more context about timing')" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px; margin-bottom: 12px;"></textarea>
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="executeQuickPolishRefine()" style="padding: 10px 20px; font-size: 14px;">Apply</button>
+                                <button onclick="refineQuickPolish()" class="secondary" style="padding: 10px 20px; font-size: 14px;">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="executive-summary">
                 <h2>👤 Your Persona</h2>
                 <p style="color: #64748b; margin-bottom: 20px;">Define your unique voice, expertise, and communication style to personalize your AI assistant.</p>
 
@@ -4926,6 +4968,283 @@ UTM Campaign Naming:
 
             document.getElementById('campaign-name-text').innerHTML = output.replace(/\n/g, '<br>');
             document.getElementById('campaign-name-output').style.display = 'block';
+        }
+
+        // Quick Polish - ChatGPT-style free-form polishing
+        let quickPolishContent = '';
+
+        function quickPolish() {
+            const input = document.getElementById('quick-polish-input').value.trim();
+
+            if (!input) {
+                alert('Please paste your rough notes or brain dump.');
+                return;
+            }
+
+            // Analyze the input to figure out what they need
+            const analysis = analyzeInput(input);
+
+            // Generate polished output
+            const polished = generatePolishedOutput(input, analysis);
+
+            // Store and display
+            quickPolishContent = polished;
+            document.getElementById('quick-polish-text').textContent = polished;
+            document.getElementById('quick-polish-output').style.display = 'block';
+            document.getElementById('quick-polish-refine-panel').style.display = 'none';
+
+            // Scroll to output
+            document.getElementById('quick-polish-output').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function analyzeInput(input) {
+            const lower = input.toLowerCase();
+
+            // Detect communication type
+            let type = 'email'; // default
+            if (lower.includes('slack') || lower.includes('message them') || lower.includes('ping them')) {
+                type = 'slack';
+            } else if (lower.includes('presentation') || lower.includes('slide')) {
+                type = 'presentation';
+            } else if (lower.includes('update') && (lower.includes('weekly') || lower.includes('status'))) {
+                type = 'update';
+            }
+
+            // Detect audience
+            let audience = 'team';
+            const names = input.match(/\b[A-Z][a-z]+\b/g) || [];
+            if (names.length > 0) {
+                audience = names[0];
+            }
+
+            // Detect if it's a recommendation
+            const isRecommendation = lower.includes('recommend') || lower.includes('plan to') || lower.includes('should');
+
+            // Detect key action/purpose
+            let purpose = 'update';
+            if (lower.includes('recommendation') || lower.includes('propose')) {
+                purpose = 'recommendation';
+            } else if (lower.includes('update') || lower.includes('status')) {
+                purpose = 'update';
+            } else if (lower.includes('request') || lower.includes('need')) {
+                purpose = 'request';
+            }
+
+            return { type, audience, isRecommendation, purpose, names };
+        }
+
+        function generatePolishedOutput(input, analysis) {
+            const { type, audience, isRecommendation, purpose, names } = analysis;
+
+            // Extract key points from the brain dump
+            const lines = input.split('\n').filter(l => l.trim());
+
+            // Build polished output
+            let output = '';
+
+            if (type === 'slack') {
+                // Slack format - concise and direct
+                output = `Hi ${audience},\n\n`;
+
+                // Find the main message
+                const mainPoints = extractMainPoints(input);
+
+                // Add context if mentioned
+                if (input.toLowerCase().includes('spoke to') || input.toLowerCase().includes('discussed with')) {
+                    const contextMatch = input.match(/spoke (?:to|with) (\w+) about (.+?)(?:\.|And|I plan)/i);
+                    if (contextMatch) {
+                        output += `I spoke with ${contextMatch[1]} about ${contextMatch[2].trim()}. `;
+                    }
+                }
+
+                // Add recommendation or main point
+                if (isRecommendation) {
+                    output += `Based on our discussion, I recommend:\n\n`;
+                    mainPoints.forEach(point => {
+                        output += `• ${point}\n`;
+                    });
+                } else {
+                    output += mainPoints.join('\n\n');
+                }
+
+                output += `\n\nLet me know if you have any questions or feedback!`;
+
+            } else {
+                // Email format - more structured
+                output = `Hi ${audience},\n\n`;
+
+                // Extract context (spoke to X about Y)
+                const contextMatch = input.match(/spoke (?:to|with) (\w+) about (.+?)(?:\.|And|and|I plan)/i);
+                if (contextMatch) {
+                    const person = contextMatch[1];
+                    const topic = contextMatch[2].trim();
+                    output += `I spoke with ${person} about ${topic}. `;
+                }
+
+                // Extract recommendation or main point
+                const recommendationMatch = input.match(/recommend(?:ation)?[:\s]+(.+?)(?:\.|This|My plan)/i);
+                if (recommendationMatch || isRecommendation) {
+                    output += `Based on our discussion, I recommend `;
+
+                    // Find the core recommendation
+                    const coreRec = extractRecommendation(input);
+                    output += coreRec + '\n\n';
+
+                    // Add supporting rationale
+                    const rationale = extractRationale(input);
+                    if (rationale) {
+                        output += rationale + '\n\n';
+                    }
+
+                    // Add implementation plan if mentioned
+                    const plan = extractPlan(input);
+                    if (plan) {
+                        output += plan + '\n\n';
+                    }
+                }
+
+                output += `Let me know if you have any feedback or additional thoughts!`;
+            }
+
+            // Polish the tone
+            output = polishTone(output);
+
+            return output;
+        }
+
+        function extractMainPoints(input) {
+            const points = [];
+            const lines = input.split('\n').filter(l => l.trim() && l.length > 20);
+
+            lines.forEach(line => {
+                // Skip lines that are just context
+                if (line.toLowerCase().includes('i spoke to') || line.toLowerCase().includes('i plan to send')) {
+                    return;
+                }
+
+                // Clean up the line
+                let cleaned = line
+                    .replace(/^(And|I plan to|I need to|I want to|We should)\s+/i, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+
+                if (cleaned.length > 15) {
+                    // Capitalize first letter
+                    cleaned = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+
+                    // Ensure it ends with punctuation
+                    if (!/[.!?]$/.test(cleaned)) {
+                        cleaned += '.';
+                    }
+
+                    points.push(cleaned);
+                }
+            });
+
+            return points;
+        }
+
+        function extractRecommendation(input) {
+            // Find the core recommendation
+            const recMatch = input.match(/placing? (?:the )?(.+?)(?:early in|within|in the|helps?|to)/i);
+            if (recMatch) {
+                let rec = recMatch[1].trim();
+                rec = rec.replace(/\s+/g, ' ');
+                return `placing ${rec} early in the Aware stage of the nurture program.`;
+            }
+
+            // Fallback: look for "plan to" statements
+            const planMatch = input.match(/plan to (.+?)(?:\.|within|in the|$)/i);
+            if (planMatch) {
+                return planMatch[1].trim() + '.';
+            }
+
+            return 'the approach we discussed.';
+        }
+
+        function extractRationale(input) {
+            // Look for "helps" or "this" explanations
+            const helpMatch = input.match(/(?:this|placing[^.]+)\s+helps? (.+?)(?:\.|before|in later)/i);
+            if (helpMatch) {
+                let rationale = helpMatch[1].trim();
+                rationale = rationale.replace(/to think about/i, 'focus on');
+                rationale = rationale.replace(/\s+/g, ' ');
+                return `This timing ${rationale}.`;
+            }
+
+            // Look for "because" statements
+            const becauseMatch = input.match(/because (.+?)(?:\.|$)/i);
+            if (becauseMatch) {
+                return `This approach ${becauseMatch[1].trim()}.`;
+            }
+
+            return null;
+        }
+
+        function extractPlan(input) {
+            // Look for implementation details
+            const planMatch = input.match(/plan (?:is )?to (.+?)(?:\.|$)/i);
+            if (planMatch) {
+                let plan = planMatch[1].trim();
+                plan = plan.replace(/\s+/g, ' ');
+
+                // Make it more structured
+                if (plan.includes('within')) {
+                    return `My plan is to ${plan}.`;
+                } else {
+                    return `Implementation: ${plan.charAt(0).toUpperCase() + plan.slice(1)}.`;
+                }
+            }
+
+            return null;
+        }
+
+        function polishTone(text) {
+            return text
+                .replace(/\s+/g, ' ')
+                .replace(/\.\./g, '.')
+                .replace(/\s+([.,!?])/g, '$1')
+                .replace(/([.!?])\s+/g, '$1 ')
+                .replace(/\s+$/gm, '')
+                .trim();
+        }
+
+        function copyQuickPolish() {
+            const content = document.getElementById('quick-polish-text').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('✅ Polished content copied to clipboard!');
+            });
+        }
+
+        function refineQuickPolish() {
+            const panel = document.getElementById('quick-polish-refine-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+                document.getElementById('quick-polish-refine-instructions').value = '';
+            }
+        }
+
+        function executeQuickPolishRefine() {
+            const instructions = document.getElementById('quick-polish-refine-instructions').value;
+
+            if (!instructions) {
+                alert('Please describe what you\'d like to refine.');
+                return;
+            }
+
+            // Apply refinement
+            const refined = applyRefinement(quickPolishContent, instructions);
+
+            // Update
+            quickPolishContent = refined;
+            document.getElementById('quick-polish-text').textContent = refined;
+            document.getElementById('quick-polish-refine-instructions').value = '';
+            refineQuickPolish();
+
+            // Scroll to output
+            document.getElementById('quick-polish-output').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     </script>
 </body>
