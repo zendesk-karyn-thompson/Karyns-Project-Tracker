@@ -1209,6 +1209,7 @@
         <nav class="main-nav">
             <button class="nav-button active" onclick="switchView('dashboard')">Dashboard</button>
             <button class="nav-button" onclick="switchView('history-archive')">History Archive</button>
+            <button class="nav-button" onclick="switchView('career-growth')">Career Growth</button>
         </nav>
 
         <div id="dashboard-view">
@@ -1404,6 +1405,96 @@
                 <div class="empty-state">
                     <h3>No updates yet</h3>
                     <p>Start adding updates to your projects to build your historical archive</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Career Growth View -->
+        <div id="career-growth-view" class="hidden">
+            <header>
+                <h1>Career Growth & Performance</h1>
+                <p class="subtitle">Track your impact, accomplishments, and skills for performance reviews and promotion conversations</p>
+            </header>
+
+            <div class="executive-summary">
+                <h2>📊 Impact Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>Total Projects</h3>
+                        <div class="summary-number total" id="career-total-projects">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>✅ Completed</h3>
+                        <div class="summary-number completed" id="career-completed-projects">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>💰 Revenue Impact</h3>
+                        <div class="summary-number in-progress" id="career-revenue-impact" style="font-size: 28px;">$0</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>🎯 OKRs Supported</h3>
+                        <div class="summary-number total" id="career-okrs-count">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="executive-summary">
+                <h2>💼 Key Accomplishments</h2>
+                <div id="accomplishments-list" style="display: grid; gap: 16px; margin-top: 20px;">
+                    <div class="empty-state">
+                        <h3>No completed projects yet</h3>
+                        <p>Complete projects to see your accomplishments here</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="executive-summary">
+                <h2>🚀 Skills Demonstrated</h2>
+                <div id="skills-chart" style="margin-top: 20px;">
+                    <div class="empty-state">
+                        <h3>No skills tracked yet</h3>
+                        <p>Add skills to your projects to see them here</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="executive-summary">
+                <h2>📝 Performance Review Assistant</h2>
+                <p style="color: #64748b; margin-bottom: 20px;">Generate content for your performance review based on your tracked projects and impact.</p>
+
+                <div style="background: #f8f9fa; padding: 24px; border-radius: 12px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 16px; font-size: 18px;">Select Time Period</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                        <select id="review-period" style="padding: 12px; border-radius: 8px; border: 2px solid #e2e8f0; font-size: 15px;">
+                            <option value="all">All Time</option>
+                            <option value="ytd" selected>Year to Date (2026)</option>
+                            <option value="q1">Q1 2026</option>
+                            <option value="q2">Q2 2026</option>
+                            <option value="last6months">Last 6 Months</option>
+                            <option value="last3months">Last 3 Months</option>
+                        </select>
+                        <button onclick="generatePerformanceReview()" style="padding: 12px 24px;">Generate Review Content</button>
+                    </div>
+                </div>
+
+                <div id="performance-review-output" style="display: none;">
+                    <div style="background: white; padding: 24px; border-radius: 12px; border: 2px solid #A1D78F;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="font-size: 18px;">Generated Content</h3>
+                            <button onclick="copyReviewContent()" class="secondary" style="padding: 8px 16px; font-size: 14px;">📋 Copy to Clipboard</button>
+                        </div>
+                        <div id="review-content" style="white-space: pre-wrap; line-height: 1.8; color: #11110D; font-size: 15px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="executive-summary">
+                <h2>📈 OKR Contributions</h2>
+                <div id="okr-contributions" style="margin-top: 20px;">
+                    <div class="empty-state">
+                        <h3>No OKR data yet</h3>
+                        <p>Link your projects to OKRs to see contributions here</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2016,6 +2107,7 @@ Dashboard: https://..."></textarea>
             document.getElementById('dashboard-view').classList.add('hidden');
             document.getElementById('detail-view').classList.add('hidden');
             document.getElementById('history-archive-view').classList.add('hidden');
+            document.getElementById('career-growth-view').classList.add('hidden');
 
             // Update nav buttons
             document.querySelectorAll('.nav-button').forEach(btn => {
@@ -2030,6 +2122,10 @@ Dashboard: https://..."></textarea>
                 document.getElementById('history-archive-view').classList.remove('hidden');
                 document.querySelectorAll('.nav-button')[1].classList.add('active');
                 renderHistoryArchive();
+            } else if (view === 'career-growth') {
+                document.getElementById('career-growth-view').classList.remove('hidden');
+                document.querySelectorAll('.nav-button')[2].classList.add('active');
+                renderCareerGrowth();
             } else if (view === 'detail') {
                 document.getElementById('detail-view').classList.remove('hidden');
             }
@@ -2440,6 +2536,308 @@ Dashboard: https://..."></textarea>
             });
 
             keyLinksContent.innerHTML = linksHtml || '<p style="color: #718096;">No links available</p>';
+        }
+
+        // Career Growth Functions
+        function renderCareerGrowth() {
+            // Update summary stats
+            const totalProjects = projects.length;
+            const completedProjects = projects.filter(p => p.status === 'completed');
+
+            document.getElementById('career-total-projects').textContent = totalProjects;
+            document.getElementById('career-completed-projects').textContent = completedProjects.length;
+
+            // Calculate revenue impact
+            let totalRevenue = 0;
+            projects.forEach(p => {
+                if (p.impact) {
+                    const revenueMatch = p.impact.match(/\$[\d,]+K?/g);
+                    if (revenueMatch) {
+                        revenueMatch.forEach(amount => {
+                            const num = parseFloat(amount.replace(/[$,K]/g, ''));
+                            totalRevenue += amount.includes('K') ? num * 1000 : num;
+                        });
+                    }
+                }
+            });
+            document.getElementById('career-revenue-impact').textContent = totalRevenue > 0 ? `$${(totalRevenue / 1000).toFixed(0)}K+` : '$0';
+
+            // Count unique OKRs
+            const okrs = new Set();
+            projects.forEach(p => {
+                if (p.okr) {
+                    const krMatches = p.okr.match(/KR\d+/g);
+                    if (krMatches) krMatches.forEach(kr => okrs.add(kr));
+                }
+            });
+            document.getElementById('career-okrs-count').textContent = okrs.size;
+
+            // Render accomplishments
+            renderAccomplishments();
+
+            // Render skills
+            renderSkills();
+
+            // Render OKR contributions
+            renderOKRContributions();
+        }
+
+        function renderAccomplishments() {
+            const accomplishmentsDiv = document.getElementById('accomplishments-list');
+            const completed = projects.filter(p => p.status === 'completed' || p.status === 'in-progress' || p.status === 'ready-to-launch');
+
+            if (completed.length === 0) {
+                accomplishmentsDiv.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No projects to display</h3>
+                        <p>Track your projects to see accomplishments here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            completed.forEach(project => {
+                const statusBadge = getStatusBadge(project.status);
+                const priorityBadge = project.priority === 'high' ? '<span style="background: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700;">HIGH PRIORITY</span>' : '';
+
+                html += `
+                    <div style="background: white; padding: 20px; border-radius: 12px; border-left: 4px solid ${getCategoryColor(project.category)}; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                            <h3 style="font-size: 18px; color: #11110D; font-weight: 700;">${project.name}</h3>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                ${priorityBadge}
+                                ${statusBadge}
+                            </div>
+                        </div>
+                        <p style="color: #64748b; margin-bottom: 12px; font-size: 15px;"><strong>Impact:</strong> ${project.tldr || project.executiveSummary}</p>
+                        ${project.impact ? `<p style="color: #11110D; font-size: 14px; line-height: 1.6;"><strong>Details:</strong> ${project.impact.substring(0, 300)}${project.impact.length > 300 ? '...' : ''}</p>` : ''}
+                        ${project.okr ? `<p style="color: #2D4C33; margin-top: 12px; font-size: 13px; font-weight: 600;"><strong>OKR:</strong> ${project.okr.split('\n')[0]}</p>` : ''}
+                    </div>
+                `;
+            });
+
+            accomplishmentsDiv.innerHTML = html;
+        }
+
+        function renderSkills() {
+            const skillsDiv = document.getElementById('skills-chart');
+            const skillCount = {};
+
+            projects.forEach(p => {
+                if (p.skills && Array.isArray(p.skills)) {
+                    p.skills.forEach(skill => {
+                        skillCount[skill] = (skillCount[skill] || 0) + 1;
+                    });
+                }
+            });
+
+            const skills = Object.entries(skillCount).sort((a, b) => b[1] - a[1]);
+
+            if (skills.length === 0) {
+                skillsDiv.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No skills tracked yet</h3>
+                        <p>Add skills to your projects to see them here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div style="display: grid; gap: 12px;">';
+            skills.forEach(([skill, count]) => {
+                const percentage = (count / projects.length) * 100;
+                html += `
+                    <div style="background: white; padding: 16px 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.06);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-weight: 700; color: #11110D; font-size: 15px;">${skill}</span>
+                            <span style="font-weight: 700; color: #2D4C33; font-size: 14px;">${count} project${count > 1 ? 's' : ''}</span>
+                        </div>
+                        <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="background: linear-gradient(135deg, #A1D78F 0%, #D1F470 100%); height: 100%; width: ${percentage}%; transition: width 0.3s;"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            skillsDiv.innerHTML = html;
+        }
+
+        function renderOKRContributions() {
+            const okrDiv = document.getElementById('okr-contributions');
+            const okrMap = {};
+
+            projects.forEach(p => {
+                if (p.okr) {
+                    const lines = p.okr.split('\n');
+                    lines.forEach(line => {
+                        if (line.includes('KR')) {
+                            const kr = line.trim();
+                            if (!okrMap[kr]) {
+                                okrMap[kr] = [];
+                            }
+                            okrMap[kr].push({
+                                name: p.name,
+                                status: p.status,
+                                impact: p.tldr || p.executiveSummary
+                            });
+                        }
+                    });
+                }
+            });
+
+            const okrs = Object.entries(okrMap);
+
+            if (okrs.length === 0) {
+                okrDiv.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No OKR data yet</h3>
+                        <p>Link your projects to OKRs to see contributions here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div style="display: grid; gap: 20px;">';
+            okrs.forEach(([okr, projectList]) => {
+                html += `
+                    <div style="background: white; padding: 24px; border-radius: 12px; border-left: 4px solid #2D4C33; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                        <h3 style="font-size: 16px; color: #2D4C33; font-weight: 700; margin-bottom: 16px;">${okr}</h3>
+                        <div style="display: grid; gap: 12px;">
+                            ${projectList.map(proj => `
+                                <div style="background: #f8f9fa; padding: 12px 16px; border-radius: 8px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-weight: 600; color: #11110D;">${proj.name}</span>
+                                        ${getStatusBadge(proj.status)}
+                                    </div>
+                                    <p style="color: #64748b; font-size: 14px; margin-top: 8px;">${proj.impact}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            okrDiv.innerHTML = html;
+        }
+
+        function generatePerformanceReview() {
+            const period = document.getElementById('review-period').value;
+            let filteredProjects = projects;
+
+            // Filter by period (simplified for now)
+            if (period === 'ytd') {
+                filteredProjects = projects.filter(p => {
+                    const createdDate = new Date(p.createdAt);
+                    return createdDate.getFullYear() === 2026;
+                });
+            }
+
+            const completed = filteredProjects.filter(p => p.status === 'completed').length;
+            const inProgress = filteredProjects.filter(p => p.status === 'in-progress').length;
+
+            // Calculate total revenue impact
+            let totalRevenue = 0;
+            filteredProjects.forEach(p => {
+                if (p.impact) {
+                    const revenueMatch = p.impact.match(/\$[\d,]+K?/g);
+                    if (revenueMatch) {
+                        revenueMatch.forEach(amount => {
+                            const num = parseFloat(amount.replace(/[$,K]/g, ''));
+                            totalRevenue += amount.includes('K') ? num * 1000 : num;
+                        });
+                    }
+                }
+            });
+
+            // Collect unique OKRs
+            const okrs = new Set();
+            filteredProjects.forEach(p => {
+                if (p.okr) {
+                    const l1Match = p.okr.match(/L1 OKR: ([^\n]+)/);
+                    if (l1Match) okrs.add(l1Match[1]);
+                }
+            });
+
+            // Collect skills
+            const skillSet = new Set();
+            filteredProjects.forEach(p => {
+                if (p.skills && Array.isArray(p.skills)) {
+                    p.skills.forEach(skill => skillSet.add(skill));
+                }
+            });
+
+            // Generate review content
+            let content = `PERFORMANCE REVIEW SUMMARY\n`;
+            content += `Period: ${getPeriodLabel(period)}\n\n`;
+
+            content += `IMPACT OVERVIEW:\n`;
+            content += `• Managed ${filteredProjects.length} strategic initiatives across lifecycle, partner, MQL, and governance programs\n`;
+            content += `• Successfully completed ${completed} projects, with ${inProgress} actively in progress\n`;
+            if (totalRevenue > 0) {
+                content += `• Contributed to an estimated $${(totalRevenue / 1000).toFixed(0)}K+ in revenue impact and pipeline generation\n`;
+            }
+            content += `• Supported ${okrs.size} key organizational OKRs\n\n`;
+
+            content += `KEY ACCOMPLISHMENTS:\n`;
+            const highlights = filteredProjects.slice(0, 5);
+            highlights.forEach((p, i) => {
+                content += `${i + 1}. ${p.name}\n`;
+                content += `   ${p.tldr || p.executiveSummary}\n`;
+                if (p.okr) {
+                    const l1Match = p.okr.match(/L1 OKR: ([^\n]+)/);
+                    if (l1Match) content += `   Supports: ${l1Match[1]}\n`;
+                }
+                content += `\n`;
+            });
+
+            content += `SKILLS & COMPETENCIES DEMONSTRATED:\n`;
+            Array.from(skillSet).forEach(skill => {
+                content += `• ${skill}\n`;
+            });
+            content += `\n`;
+
+            content += `STRATEGIC CONTRIBUTIONS:\n`;
+            okrs.forEach(okr => {
+                const relatedProjects = filteredProjects.filter(p => p.okr && p.okr.includes(okr));
+                content += `• ${okr}\n`;
+                content += `  Delivered ${relatedProjects.length} initiative${relatedProjects.length > 1 ? 's' : ''} supporting this objective\n`;
+            });
+
+            // Display the content
+            document.getElementById('review-content').textContent = content;
+            document.getElementById('performance-review-output').style.display = 'block';
+        }
+
+        function copyReviewContent() {
+            const content = document.getElementById('review-content').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('Performance review content copied to clipboard!');
+            });
+        }
+
+        function getPeriodLabel(period) {
+            const labels = {
+                'all': 'All Time',
+                'ytd': 'Year to Date (2026)',
+                'q1': 'Q1 2026',
+                'q2': 'Q2 2026',
+                'last6months': 'Last 6 Months',
+                'last3months': 'Last 3 Months'
+            };
+            return labels[period] || period;
+        }
+
+        function getCategoryColor(category) {
+            const colors = {
+                'lifecycle': '#2D4C33',
+                'partner': '#203524',
+                'mql': '#A1D78F',
+                'governance': '#D1F470'
+            };
+            return colors[category] || '#11110D';
         }
     </script>
 </body>
