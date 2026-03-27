@@ -1209,6 +1209,7 @@
     <div class="container">
         <nav class="main-nav">
             <button class="nav-button active" onclick="switchView('dashboard')">Dashboard</button>
+            <button class="nav-button" onclick="switchView('okr-manager')">OKR Manager</button>
             <button class="nav-button" onclick="switchView('history-archive')">History Archive</button>
             <button class="nav-button" onclick="switchView('career-growth')">Career Growth</button>
             <button class="nav-button" onclick="switchView('brag-book')">Brag Book</button>
@@ -1384,6 +1385,59 @@
                 <div class="form-actions">
                     <button onclick="openEditModal()">Edit Project</button>
                     <button class="secondary" onclick="deleteProject()">Delete Project</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- OKR Manager View -->
+        <div id="okr-manager-view" class="hidden">
+            <header>
+                <h1>OKR Manager</h1>
+                <p class="subtitle">Track your Objectives and Key Results with progress, learnings, and project alignment</p>
+            </header>
+
+            <div class="executive-summary">
+                <h2>📊 OKR Overview</h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>Total OKRs</h3>
+                        <div class="summary-number total" id="okr-total-count">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>✅ Complete (100%)</h3>
+                        <div class="summary-number completed" id="okr-complete-count">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>🔥 In Progress</h3>
+                        <div class="summary-number in-progress" id="okr-in-progress-count">0</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>📈 Avg Progress</h3>
+                        <div class="summary-number total" id="okr-avg-progress">0%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+                <h2>Your OKRs</h2>
+                <button onclick="openOKRModal()" style="background: #2D4C33; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">+ Add OKR</button>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 32px; max-width: 300px;">
+                <label for="okr-quarter-filter">Filter by Quarter</label>
+                <select id="okr-quarter-filter" onchange="renderOKRs()">
+                    <option value="all">All Quarters</option>
+                    <option value="Q1">Q1</option>
+                    <option value="Q2">Q2</option>
+                    <option value="Q3">Q3</option>
+                    <option value="Q4">Q4</option>
+                </select>
+            </div>
+
+            <div id="okr-list" style="display: grid; gap: 24px;">
+                <div class="empty-state">
+                    <h3>No OKRs yet</h3>
+                    <p>Click "Add OKR" to start tracking your objectives and key results</p>
                 </div>
             </div>
         </div>
@@ -1957,7 +2011,10 @@ Dashboard: https://..."></textarea>
 
                 <div class="form-group">
                     <label for="project-okr">OKR Alignment (Optional)</label>
-                    <textarea id="project-okr" placeholder="Which OKRs does this support?"></textarea>
+                    <select id="project-okr">
+                        <option value="">No OKR linked</option>
+                    </select>
+                    <small style="color: #718096; display: block; margin-top: 4px;">Create OKRs in the OKR Manager first, then link them here</small>
                 </div>
 
                 <div class="form-group">
@@ -2002,6 +2059,77 @@ Dashboard: https://..."></textarea>
                     <button type="button" class="secondary" onclick="closeProjectModal()">Cancel</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- OKR Modal -->
+    <div id="okr-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="okr-modal-title">Add OKR</h2>
+                <button class="close-button" onclick="closeOKRModal()">×</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="okr-quarter">Quarter *</label>
+                    <select id="okr-quarter" required>
+                        <option value="">Select Quarter</option>
+                        <option value="Q1">Q1</option>
+                        <option value="Q2">Q2</option>
+                        <option value="Q3">Q3</option>
+                        <option value="Q4">Q4</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="okr-name">OKR Name *</label>
+                    <input type="text" id="okr-name" placeholder="e.g., Increase engaged web sessions by 30%" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="okr-target">Target Goal</label>
+                    <input type="text" id="okr-target" placeholder="Share specific numbers; leave blank if qualitative">
+                    <small style="color: #718096; display: block; margin-top: 4px;">e.g., "30% increase" or "Launch 5 new campaigns"</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="okr-actual">Actual Result</label>
+                    <input type="text" id="okr-actual" placeholder="Share specific numbers; leave blank if qualitative">
+                    <small style="color: #718096; display: block; margin-top: 4px;">e.g., "35% increase achieved" or "Launched 4 campaigns"</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="okr-completion">Completion % *</label>
+                    <select id="okr-completion" required>
+                        <option value="">Select completion level</option>
+                        <option value="100">100%+ - met or exceeded goal</option>
+                        <option value="90">90% - nearly achieved goal</option>
+                        <option value="80">80% - did not achieve, but started to progress</option>
+                        <option value="50">50% or less - did not tackle at all</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="reason-group" style="display: none;">
+                    <label for="okr-reason">Reason for < 50% completion</label>
+                    <textarea id="okr-reason" rows="2" placeholder="Explain why this OKR was not tackled"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="okr-learnings">Key Learnings</label>
+                    <textarea id="okr-learnings" rows="3" placeholder="High level learnings that others might benefit from (e.g., X person was a key partner; We didn't anticipate Y priority, etc.)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="okr-notes">Notes, Resources, Key Links</label>
+                    <textarea id="okr-notes" rows="3" placeholder="Links to deliverables, reporting, and other resources"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button onclick="saveOKR()">Save OKR</button>
+                    <button class="secondary" onclick="closeOKRModal()">Cancel</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2069,9 +2197,11 @@ Dashboard: https://..."></textarea>
     <script>
         // Data storage
         let projects = [];
+        let okrs = [];
         let bragBook = [];
         let persona = {};
         let currentProjectId = null;
+        let currentOKRId = null;
         let editingProjectId = null;
         let editingBragId = null;
         let currentView = 'dashboard';
@@ -2108,6 +2238,10 @@ Dashboard: https://..."></textarea>
             if (storedBrag) {
                 bragBook = JSON.parse(storedBrag);
             }
+            const storedOKRs = localStorage.getItem('okrs');
+            if (storedOKRs) {
+                okrs = JSON.parse(storedOKRs);
+            }
             const storedPersona = localStorage.getItem('persona');
             if (storedPersona) {
                 persona = JSON.parse(storedPersona);
@@ -2119,6 +2253,7 @@ Dashboard: https://..."></textarea>
             localStorage.setItem('projects', JSON.stringify(projects));
             localStorage.setItem('bragBook', JSON.stringify(bragBook));
             localStorage.setItem('persona', JSON.stringify(persona));
+            localStorage.setItem('okrs', JSON.stringify(okrs));
         }
 
         // Alias for compatibility
@@ -2236,6 +2371,249 @@ Dashboard: https://..."></textarea>
                 </div>
             `;
         }
+
+        // ===== OKR MANAGEMENT FUNCTIONS =====
+
+        // Open OKR Modal
+        function openOKRModal(okrId = null) {
+            currentOKRId = okrId;
+            const modal = document.getElementById('okr-modal');
+            const title = document.getElementById('okr-modal-title');
+
+            if (okrId) {
+                const okr = okrs.find(o => o.id === okrId);
+                if (okr) {
+                    title.textContent = 'Edit OKR';
+                    document.getElementById('okr-quarter').value = okr.quarter;
+                    document.getElementById('okr-name').value = okr.name;
+                    document.getElementById('okr-target').value = okr.target || '';
+                    document.getElementById('okr-actual').value = okr.actual || '';
+                    document.getElementById('okr-completion').value = okr.completion;
+                    document.getElementById('okr-reason').value = okr.reason || '';
+                    document.getElementById('okr-learnings').value = okr.learnings || '';
+                    document.getElementById('okr-notes').value = okr.notes || '';
+
+                    if (okr.completion === '50') {
+                        document.getElementById('reason-group').style.display = 'block';
+                    }
+                }
+            } else {
+                title.textContent = 'Add OKR';
+                document.getElementById('okr-quarter').value = '';
+                document.getElementById('okr-name').value = '';
+                document.getElementById('okr-target').value = '';
+                document.getElementById('okr-actual').value = '';
+                document.getElementById('okr-completion').value = '';
+                document.getElementById('okr-reason').value = '';
+                document.getElementById('okr-learnings').value = '';
+                document.getElementById('okr-notes').value = '';
+                document.getElementById('reason-group').style.display = 'none';
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        // Close OKR Modal
+        function closeOKRModal() {
+            document.getElementById('okr-modal').style.display = 'none';
+            currentOKRId = null;
+        }
+
+        // Save OKR
+        function saveOKR() {
+            const quarter = document.getElementById('okr-quarter').value;
+            const name = document.getElementById('okr-name').value;
+            const completion = document.getElementById('okr-completion').value;
+
+            if (!quarter || !name || !completion) {
+                alert('Please fill in required fields (Quarter, OKR Name, Completion %)');
+                return;
+            }
+
+            const okrData = {
+                id: currentOKRId || Date.now().toString(),
+                quarter: quarter,
+                name: name,
+                target: document.getElementById('okr-target').value,
+                actual: document.getElementById('okr-actual').value,
+                completion: completion,
+                reason: document.getElementById('okr-reason').value,
+                learnings: document.getElementById('okr-learnings').value,
+                notes: document.getElementById('okr-notes').value,
+                year: 2026,
+                createdAt: currentOKRId ? okrs.find(o => o.id === currentOKRId).createdAt : new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            if (currentOKRId) {
+                const index = okrs.findIndex(o => o.id === currentOKRId);
+                okrs[index] = okrData;
+            } else {
+                okrs.push(okrData);
+            }
+
+            saveProjects();
+            renderOKRs();
+            closeOKRModal();
+        }
+
+        // Delete OKR
+        function deleteOKR(okrId) {
+            if (confirm('Are you sure you want to delete this OKR? This will also remove it from any linked projects.')) {
+                okrs = okrs.filter(o => o.id !== okrId);
+
+                // Remove OKR from projects
+                projects.forEach(p => {
+                    if (p.okrId === okrId) {
+                        p.okrId = null;
+                    }
+                });
+
+                saveProjects();
+                renderOKRs();
+            }
+        }
+
+        // Render OKRs
+        function renderOKRs() {
+            const filter = document.getElementById('okr-quarter-filter')?.value || 'all';
+            let filteredOKRs = okrs;
+
+            if (filter !== 'all') {
+                filteredOKRs = okrs.filter(o => o.quarter === filter);
+            }
+
+            // Update summary stats
+            document.getElementById('okr-total-count').textContent = okrs.length;
+            document.getElementById('okr-complete-count').textContent = okrs.filter(o => o.completion === '100').length;
+            document.getElementById('okr-in-progress-count').textContent = okrs.filter(o => o.completion !== '100' && o.completion !== '50').length;
+
+            const avgProgress = okrs.length > 0
+                ? Math.round(okrs.reduce((sum, o) => sum + parseInt(o.completion), 0) / okrs.length)
+                : 0;
+            document.getElementById('okr-avg-progress').textContent = avgProgress + '%';
+
+            const listDiv = document.getElementById('okr-list');
+
+            if (filteredOKRs.length === 0) {
+                listDiv.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No OKRs ${filter !== 'all' ? 'for ' + filter : 'yet'}</h3>
+                        <p>Click "Add OKR" to start tracking your objectives and key results</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by quarter
+            const byQuarter = {};
+            filteredOKRs.forEach(okr => {
+                if (!byQuarter[okr.quarter]) byQuarter[okr.quarter] = [];
+                byQuarter[okr.quarter].push(okr);
+            });
+
+            let html = '';
+            ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
+                if (byQuarter[quarter]) {
+                    html += `
+                        <div style="margin-bottom: 40px;">
+                            <h3 style="font-size: 20px; color: #2D4C33; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #D1F470;">${quarter} 2026</h3>
+                            <div style="display: grid; gap: 20px;">
+                                ${byQuarter[quarter].map(okr => {
+                                    const linkedProjects = projects.filter(p => p.okrId === okr.id);
+                                    const completionColor = okr.completion === '100' ? '#10b981' :
+                                                          okr.completion === '90' ? '#3b82f6' :
+                                                          okr.completion === '80' ? '#f59e0b' : '#ef4444';
+
+                                    return `
+                                        <div style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid ${completionColor};">
+                                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                                                <div style="flex: 1;">
+                                                    <h4 style="font-size: 18px; color: #11110D; margin-bottom: 8px; font-weight: 600;">${okr.name}</h4>
+                                                    <div style="display: flex; gap: 12px; align-items: center;">
+                                                        <span style="background: ${completionColor}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;">${okr.completion}%</span>
+                                                        ${linkedProjects.length > 0 ? `<span style="color: #718096; font-size: 13px;">📊 ${linkedProjects.length} project${linkedProjects.length > 1 ? 's' : ''} linked</span>` : ''}
+                                                    </div>
+                                                </div>
+                                                <div style="display: flex; gap: 8px;">
+                                                    <button onclick="event.stopPropagation(); openOKRModal('${okr.id}')" style="background: #f3f4f6; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; color: #4b5563;">Edit</button>
+                                                    <button onclick="event.stopPropagation(); deleteOKR('${okr.id}')" style="background: #fee2e2; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; color: #dc2626;">Delete</button>
+                                                </div>
+                                            </div>
+
+                                            ${okr.target ? `
+                                                <div style="margin-bottom: 12px;">
+                                                    <strong style="color: #4b5563; font-size: 13px;">Target:</strong>
+                                                    <span style="color: #11110D; font-size: 14px; margin-left: 8px;">${okr.target}</span>
+                                                </div>
+                                            ` : ''}
+
+                                            ${okr.actual ? `
+                                                <div style="margin-bottom: 12px;">
+                                                    <strong style="color: #4b5563; font-size: 13px;">Actual Result:</strong>
+                                                    <span style="color: #11110D; font-size: 14px; margin-left: 8px;">${okr.actual}</span>
+                                                </div>
+                                            ` : ''}
+
+                                            ${okr.learnings ? `
+                                                <div style="margin-bottom: 12px;">
+                                                    <strong style="color: #4b5563; font-size: 13px;">Key Learnings:</strong>
+                                                    <p style="color: #11110D; font-size: 14px; margin-top: 4px; line-height: 1.6;">${okr.learnings}</p>
+                                                </div>
+                                            ` : ''}
+
+                                            ${okr.reason ? `
+                                                <div style="margin-bottom: 12px; background: #fef3c7; padding: 12px; border-radius: 8px;">
+                                                    <strong style="color: #92400e; font-size: 13px;">Reason for low completion:</strong>
+                                                    <p style="color: #78350f; font-size: 14px; margin-top: 4px;">${okr.reason}</p>
+                                                </div>
+                                            ` : ''}
+
+                                            ${okr.notes ? `
+                                                <div style="margin-bottom: 12px;">
+                                                    <strong style="color: #4b5563; font-size: 13px;">Notes & Resources:</strong>
+                                                    <p style="color: #11110D; font-size: 14px; margin-top: 4px; line-height: 1.6; white-space: pre-wrap;">${okr.notes}</p>
+                                                </div>
+                                            ` : ''}
+
+                                            ${linkedProjects.length > 0 ? `
+                                                <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+                                                    <strong style="color: #4b5563; font-size: 13px;">Linked Projects:</strong>
+                                                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+                                                        ${linkedProjects.map(p => `
+                                                            <span onclick="showProjectDetail('${p.id}')" style="background: #f3f4f6; padding: 6px 12px; border-radius: 6px; font-size: 13px; cursor: pointer; color: #2D4C33; font-weight: 500;">
+                                                                ${p.name}
+                                                            </span>
+                                                        `).join('')}
+                                                    </div>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            listDiv.innerHTML = html;
+        }
+
+        // Show/hide reason field based on completion %
+        document.addEventListener('DOMContentLoaded', () => {
+            const completionSelect = document.getElementById('okr-completion');
+            if (completionSelect) {
+                completionSelect.addEventListener('change', (e) => {
+                    const reasonGroup = document.getElementById('reason-group');
+                    if (e.target.value === '50') {
+                        reasonGroup.style.display = 'block';
+                    } else {
+                        reasonGroup.style.display = 'none';
+                    }
+                });
+            }
+        });
 
         // Render project cards
         function renderProjectCards(projectList) {
@@ -2408,7 +2786,31 @@ Dashboard: https://..."></textarea>
             document.getElementById('section-impact').textContent = project.impact || 'No impact data yet';
             document.getElementById('section-risks').textContent = project.risks || 'No risks identified';
             document.getElementById('section-links').innerHTML = formatLinks(project.links);
-            document.getElementById('section-okr').textContent = project.okr || 'No OKR alignment specified';
+
+            // Display OKR with link
+            const okrDiv = document.getElementById('section-okr');
+            if (project.okrId) {
+                const okr = okrs.find(o => o.id === project.okrId);
+                if (okr) {
+                    okrDiv.innerHTML = `
+                        <div style="background: #f9fafb; padding: 16px; border-radius: 8px; border-left: 4px solid #2D4C33;">
+                            <div style="font-size: 16px; font-weight: 600; color: #11110D; margin-bottom: 8px;">${okr.name}</div>
+                            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px;">
+                                <span style="background: ${okr.completion === '100' ? '#10b981' : okr.completion === '90' ? '#3b82f6' : okr.completion === '80' ? '#f59e0b' : '#ef4444'}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${okr.completion}%</span>
+                                <span style="color: #718096; font-size: 13px;">${okr.quarter} 2026</span>
+                            </div>
+                            ${okr.target ? `<div style="color: #4b5563; font-size: 14px; margin-bottom: 4px;"><strong>Target:</strong> ${okr.target}</div>` : ''}
+                            ${okr.actual ? `<div style="color: #4b5563; font-size: 14px;"><strong>Actual:</strong> ${okr.actual}</div>` : ''}
+                            <button onclick="switchView('okr-manager')" style="margin-top: 12px; background: #2D4C33; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">View in OKR Manager</button>
+                        </div>
+                    `;
+                } else {
+                    okrDiv.textContent = 'OKR not found (may have been deleted)';
+                }
+            } else {
+                okrDiv.textContent = 'No OKR alignment specified';
+            }
+
             document.getElementById('section-skills').innerHTML = formatSkills(project.skills);
 
             renderKeyLinks(project);
@@ -2470,8 +2872,11 @@ Dashboard: https://..."></textarea>
                 impacts.push(`<strong>Skills Demonstrated:</strong> ${project.skills.join(', ')}`);
             }
 
-            if (project.okr) {
-                impacts.push(`<strong>Strategic Contribution:</strong> Directly supports company OKRs and strategic priorities`);
+            if (project.okrId) {
+                const okr = okrs.find(o => o.id === project.okrId);
+                if (okr) {
+                    impacts.push(`<strong>Strategic Contribution:</strong> Directly supports ${okr.name}`);
+                }
             }
 
             if (project.priority === 'high') {
@@ -2553,6 +2958,7 @@ Dashboard: https://..."></textarea>
             // Hide all views
             document.getElementById('dashboard-view').classList.add('hidden');
             document.getElementById('detail-view').classList.add('hidden');
+            document.getElementById('okr-manager-view').classList.add('hidden');
             document.getElementById('history-archive-view').classList.add('hidden');
             document.getElementById('career-growth-view').classList.add('hidden');
             document.getElementById('brag-book-view').classList.add('hidden');
@@ -2567,21 +2973,25 @@ Dashboard: https://..."></textarea>
             if (view === 'dashboard') {
                 document.getElementById('dashboard-view').classList.remove('hidden');
                 document.querySelectorAll('.nav-button')[0].classList.add('active');
+            } else if (view === 'okr-manager') {
+                document.getElementById('okr-manager-view').classList.remove('hidden');
+                document.querySelectorAll('.nav-button')[1].classList.add('active');
+                renderOKRs();
             } else if (view === 'history-archive') {
                 document.getElementById('history-archive-view').classList.remove('hidden');
-                document.querySelectorAll('.nav-button')[1].classList.add('active');
+                document.querySelectorAll('.nav-button')[2].classList.add('active');
                 renderHistoryArchive();
             } else if (view === 'career-growth') {
                 document.getElementById('career-growth-view').classList.remove('hidden');
-                document.querySelectorAll('.nav-button')[2].classList.add('active');
+                document.querySelectorAll('.nav-button')[3].classList.add('active');
                 renderCareerGrowth();
             } else if (view === 'brag-book') {
                 document.getElementById('brag-book-view').classList.remove('hidden');
-                document.querySelectorAll('.nav-button')[3].classList.add('active');
+                document.querySelectorAll('.nav-button')[4].classList.add('active');
                 renderBragBook();
             } else if (view === 'digital-twin') {
                 document.getElementById('digital-twin-view').classList.remove('hidden');
-                document.querySelectorAll('.nav-button')[4].classList.add('active');
+                document.querySelectorAll('.nav-button')[5].classList.add('active');
                 renderDigitalTwin();
             } else if (view === 'detail') {
                 document.getElementById('detail-view').classList.remove('hidden');
@@ -2723,7 +3133,34 @@ Dashboard: https://..."></textarea>
             editingProjectId = null;
             document.getElementById('modal-title').textContent = 'Add New Project';
             document.getElementById('project-form').reset();
+            populateOKRDropdown();
             document.getElementById('project-modal').classList.add('active');
+        }
+
+        // Populate OKR dropdown
+        function populateOKRDropdown(selectedOKRId = null) {
+            const select = document.getElementById('project-okr');
+            let html = '<option value="">No OKR linked</option>';
+
+            // Group OKRs by quarter
+            const byQuarter = {};
+            okrs.forEach(okr => {
+                if (!byQuarter[okr.quarter]) byQuarter[okr.quarter] = [];
+                byQuarter[okr.quarter].push(okr);
+            });
+
+            ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
+                if (byQuarter[quarter]) {
+                    html += `<optgroup label="${quarter} 2026">`;
+                    byQuarter[quarter].forEach(okr => {
+                        const selected = selectedOKRId === okr.id ? 'selected' : '';
+                        html += `<option value="${okr.id}" ${selected}>${okr.name}</option>`;
+                    });
+                    html += `</optgroup>`;
+                }
+            });
+
+            select.innerHTML = html;
         }
 
         // Open edit modal
@@ -2748,7 +3185,9 @@ Dashboard: https://..."></textarea>
             document.getElementById('project-impact').value = project.impact || '';
             document.getElementById('project-risks').value = project.risks || '';
             document.getElementById('project-links').value = project.links || '';
-            document.getElementById('project-okr').value = project.okr || '';
+
+            // Populate OKR dropdown with selected OKR
+            populateOKRDropdown(project.okrId || null);
 
             // Set skills checkboxes
             document.querySelectorAll('input[name="skill"]').forEach(cb => {
@@ -2786,7 +3225,7 @@ Dashboard: https://..."></textarea>
                 impact: document.getElementById('project-impact').value,
                 risks: document.getElementById('project-risks').value,
                 links: document.getElementById('project-links').value,
-                okr: document.getElementById('project-okr').value,
+                okrId: document.getElementById('project-okr').value,
                 skills: skills
             };
 
@@ -3040,14 +3479,13 @@ Dashboard: https://..."></textarea>
             document.getElementById('career-revenue-impact').textContent = totalRevenue > 0 ? `$${(totalRevenue / 1000).toFixed(0)}K+` : '$0';
 
             // Count unique OKRs
-            const okrs = new Set();
+            const uniqueOKRs = new Set();
             projects.forEach(p => {
-                if (p.okr) {
-                    const krMatches = p.okr.match(/KR\d+/g);
-                    if (krMatches) krMatches.forEach(kr => okrs.add(kr));
+                if (p.okrId) {
+                    uniqueOKRs.add(p.okrId);
                 }
             });
-            document.getElementById('career-okrs-count').textContent = okrs.size;
+            document.getElementById('career-okrs-count').textContent = uniqueOKRs.size;
 
             // Render accomplishments
             renderAccomplishments();
@@ -3089,7 +3527,10 @@ Dashboard: https://..."></textarea>
                         </div>
                         <p style="color: #64748b; margin-bottom: 12px; font-size: 15px;"><strong>Impact:</strong> ${project.tldr || project.executiveSummary}</p>
                         ${project.impact ? `<p style="color: #11110D; font-size: 14px; line-height: 1.6;"><strong>Details:</strong> ${project.impact.substring(0, 300)}${project.impact.length > 300 ? '...' : ''}</p>` : ''}
-                        ${project.okr ? `<p style="color: #2D4C33; margin-top: 12px; font-size: 13px; font-weight: 600;"><strong>OKR:</strong> ${project.okr.split('\n')[0]}</p>` : ''}
+                        ${project.okrId ? (() => {
+                            const okr = okrs.find(o => o.id === project.okrId);
+                            return okr ? `<p style="color: #2D4C33; margin-top: 12px; font-size: 13px; font-weight: 600;"><strong>OKR:</strong> ${okr.name} (${okr.completion}%)</p>` : '';
+                        })() : ''}
                     </div>
                 `;
             });
@@ -3143,30 +3584,25 @@ Dashboard: https://..."></textarea>
 
         function renderOKRContributions() {
             const okrDiv = document.getElementById('okr-contributions');
-            const okrMap = {};
 
+            // Group projects by OKR
+            const okrMap = {};
             projects.forEach(p => {
-                if (p.okr) {
-                    const lines = p.okr.split('\n');
-                    lines.forEach(line => {
-                        if (line.includes('KR')) {
-                            const kr = line.trim();
-                            if (!okrMap[kr]) {
-                                okrMap[kr] = [];
-                            }
-                            okrMap[kr].push({
-                                name: p.name,
-                                status: p.status,
-                                impact: p.tldr || p.executiveSummary
-                            });
-                        }
+                if (p.okrId) {
+                    if (!okrMap[p.okrId]) {
+                        okrMap[p.okrId] = [];
+                    }
+                    okrMap[p.okrId].push({
+                        name: p.name,
+                        status: p.status,
+                        impact: p.tldr || p.executiveSummary
                     });
                 }
             });
 
-            const okrs = Object.entries(okrMap);
+            const okrEntries = Object.entries(okrMap);
 
-            if (okrs.length === 0) {
+            if (okrEntries.length === 0) {
                 okrDiv.innerHTML = `
                     <div class="empty-state">
                         <h3>No OKR data yet</h3>
@@ -3177,10 +3613,26 @@ Dashboard: https://..."></textarea>
             }
 
             let html = '<div style="display: grid; gap: 20px;">';
-            okrs.forEach(([okr, projectList]) => {
+            okrEntries.forEach(([okrId, projectList]) => {
+                const okr = okrs.find(o => o.id === okrId);
+                if (!okr) return;
+
+                const completionColor = okr.completion === '100' ? '#10b981' :
+                                      okr.completion === '90' ? '#3b82f6' :
+                                      okr.completion === '80' ? '#f59e0b' : '#ef4444';
+
                 html += `
-                    <div style="background: white; padding: 24px; border-radius: 12px; border-left: 4px solid #2D4C33; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
-                        <h3 style="font-size: 16px; color: #2D4C33; font-weight: 700; margin-bottom: 16px;">${okr}</h3>
+                    <div style="background: white; padding: 24px; border-radius: 12px; border-left: 4px solid ${completionColor}; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                            <div>
+                                <h3 style="font-size: 16px; color: #2D4C33; font-weight: 700; margin-bottom: 8px;">${okr.name}</h3>
+                                <div style="display: flex; gap: 12px; align-items: center;">
+                                    <span style="background: ${completionColor}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${okr.completion}%</span>
+                                    <span style="color: #718096; font-size: 13px;">${okr.quarter} 2026</span>
+                                </div>
+                            </div>
+                            <button onclick="switchView('okr-manager')" style="background: #2D4C33; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">View OKR</button>
+                        </div>
                         <div style="display: grid; gap: 12px;">
                             ${projectList.map(proj => `
                                 <div style="background: #f8f9fa; padding: 12px 16px; border-radius: 8px;">
@@ -3230,11 +3682,13 @@ Dashboard: https://..."></textarea>
             });
 
             // Collect unique OKRs
-            const okrs = new Set();
+            const uniqueOKRIds = new Set();
+            const okrDetails = [];
             filteredProjects.forEach(p => {
-                if (p.okr) {
-                    const l1Match = p.okr.match(/L1 OKR: ([^\n]+)/);
-                    if (l1Match) okrs.add(l1Match[1]);
+                if (p.okrId && !uniqueOKRIds.has(p.okrId)) {
+                    uniqueOKRIds.add(p.okrId);
+                    const okr = okrs.find(o => o.id === p.okrId);
+                    if (okr) okrDetails.push(okr);
                 }
             });
 
@@ -3256,16 +3710,16 @@ Dashboard: https://..."></textarea>
             if (totalRevenue > 0) {
                 content += `• Contributed to an estimated $${(totalRevenue / 1000).toFixed(0)}K+ in revenue impact and pipeline generation\n`;
             }
-            content += `• Supported ${okrs.size} key organizational OKRs\n\n`;
+            content += `• Supported ${okrDetails.length} key organizational OKRs\n\n`;
 
             content += `KEY ACCOMPLISHMENTS:\n`;
             const highlights = filteredProjects.slice(0, 5);
             highlights.forEach((p, i) => {
                 content += `${i + 1}. ${p.name}\n`;
                 content += `   ${p.tldr || p.executiveSummary}\n`;
-                if (p.okr) {
-                    const l1Match = p.okr.match(/L1 OKR: ([^\n]+)/);
-                    if (l1Match) content += `   Supports: ${l1Match[1]}\n`;
+                if (p.okrId) {
+                    const okr = okrs.find(o => o.id === p.okrId);
+                    if (okr) content += `   Supports: ${okr.name} (${okr.completion}% complete)\n`;
                 }
                 content += `\n`;
             });
@@ -3277,9 +3731,9 @@ Dashboard: https://..."></textarea>
             content += `\n`;
 
             content += `STRATEGIC CONTRIBUTIONS:\n`;
-            okrs.forEach(okr => {
-                const relatedProjects = filteredProjects.filter(p => p.okr && p.okr.includes(okr));
-                content += `• ${okr}\n`;
+            okrDetails.forEach(okr => {
+                const relatedProjects = filteredProjects.filter(p => p.okrId === okr.id);
+                content += `• ${okr.name} (${okr.completion}% complete)\n`;
                 content += `  Delivered ${relatedProjects.length} initiative${relatedProjects.length > 1 ? 's' : ''} supporting this objective\n`;
             });
 
@@ -3587,7 +4041,10 @@ Dashboard: https://..."></textarea>
                 const project = projects.find(p => p.id === projectId);
                 if (project) {
                     projectContext = `\n\nProject Context:\n- Project: ${project.name}\n- Status: ${project.status}\n- Overview: ${project.tldr || project.executiveSummary}`;
-                    if (project.okr) projectContext += `\n- OKR: ${project.okr.split('\n')[0]}`;
+                    if (project.okrId) {
+                        const okr = okrs.find(o => o.id === project.okrId);
+                        if (okr) projectContext += `\n- OKR: ${okr.name} (${okr.completion}% complete)`;
+                    }
                 }
             }
 
