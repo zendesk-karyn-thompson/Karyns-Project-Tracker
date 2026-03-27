@@ -2012,11 +2012,11 @@ Dashboard: https://..."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label for="project-okr">OKR Alignment (Optional)</label>
-                    <select id="project-okr">
-                        <option value="">No OKR linked</option>
-                    </select>
-                    <small style="color: #718096; display: block; margin-top: 4px;">Create OKRs in the OKR Manager first, then link them here</small>
+                    <label>OKR Alignment (Optional)</label>
+                    <small style="color: #718096; display: block; margin-bottom: 12px;">Select one or more OKRs this project supports</small>
+                    <div id="project-okr-checkboxes" style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; background: #f9fafb;">
+                        <p style="color: #718096; text-align: center;">Create OKRs in the OKR Manager first</p>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -2468,8 +2468,12 @@ Dashboard: https://..."></textarea>
 
                 // Remove OKR from projects
                 projects.forEach(p => {
+                    // Handle both old single okrId and new okrIds array
                     if (p.okrId === okrId) {
                         p.okrId = null;
+                    }
+                    if (p.okrIds && Array.isArray(p.okrIds)) {
+                        p.okrIds = p.okrIds.filter(id => id !== okrId);
                     }
                 });
 
@@ -2531,7 +2535,13 @@ Dashboard: https://..."></textarea>
                             <h3 style="font-size: 20px; color: #2D4C33; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #D1F470;">${getPeriodLabel(period)}</h3>
                             <div style="display: grid; gap: 20px;">
                                 ${byPeriod[period].map(okr => {
-                                    const linkedProjects = projects.filter(p => p.okrId === okr.id);
+                                    const linkedProjects = projects.filter(p => {
+                                        // Handle both old single okrId and new okrIds array
+                                        if (p.okrIds && Array.isArray(p.okrIds)) {
+                                            return p.okrIds.includes(okr.id);
+                                        }
+                                        return p.okrId === okr.id;
+                                    });
                                     const completionColor = okr.completion === '100' ? '#10b981' :
                                                           okr.completion === '90' ? '#3b82f6' :
                                                           okr.completion === '80' ? '#f59e0b' : '#ef4444';
@@ -2798,25 +2808,39 @@ Dashboard: https://..."></textarea>
             document.getElementById('section-risks').textContent = project.risks || 'No risks identified';
             document.getElementById('section-links').innerHTML = formatLinks(project.links);
 
-            // Display OKR with link
+            // Display OKRs with links
             const okrDiv = document.getElementById('section-okr');
-            if (project.okrId) {
-                const okr = okrs.find(o => o.id === project.okrId);
-                if (okr) {
+
+            // Handle both old single okrId and new okrIds array
+            let linkedOKRIds = [];
+            if (project.okrIds && Array.isArray(project.okrIds)) {
+                linkedOKRIds = project.okrIds;
+            } else if (project.okrId) {
+                linkedOKRIds = [project.okrId];
+            }
+
+            if (linkedOKRIds.length > 0) {
+                const linkedOKRs = linkedOKRIds.map(id => okrs.find(o => o.id === id)).filter(o => o);
+
+                if (linkedOKRs.length > 0) {
                     okrDiv.innerHTML = `
-                        <div style="background: #f9fafb; padding: 16px; border-radius: 8px; border-left: 4px solid #2D4C33;">
-                            <div style="font-size: 16px; font-weight: 600; color: #11110D; margin-bottom: 8px;">${okr.name}</div>
-                            <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px;">
-                                <span style="background: ${okr.completion === '100' ? '#10b981' : okr.completion === '90' ? '#3b82f6' : okr.completion === '80' ? '#f59e0b' : '#ef4444'}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${okr.completion}%</span>
-                                <span style="color: #718096; font-size: 13px;">${okr.quarter === 'H1' ? 'H1 2026' : okr.quarter === 'H2' ? 'H2 2026' : okr.quarter + ' 2026'}</span>
-                            </div>
-                            ${okr.target ? `<div style="color: #4b5563; font-size: 14px; margin-bottom: 4px;"><strong>Target:</strong> ${okr.target}</div>` : ''}
-                            ${okr.actual ? `<div style="color: #4b5563; font-size: 14px;"><strong>Actual:</strong> ${okr.actual}</div>` : ''}
-                            <button onclick="switchView('okr-manager')" style="margin-top: 12px; background: #2D4C33; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">View in OKR Manager</button>
+                        <div style="display: grid; gap: 12px;">
+                            ${linkedOKRs.map(okr => `
+                                <div style="background: #f9fafb; padding: 16px; border-radius: 8px; border-left: 4px solid ${okr.completion === '100' ? '#10b981' : okr.completion === '90' ? '#3b82f6' : okr.completion === '80' ? '#f59e0b' : '#ef4444'};">
+                                    <div style="font-size: 16px; font-weight: 600; color: #11110D; margin-bottom: 8px;">${okr.name}</div>
+                                    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px;">
+                                        <span style="background: ${okr.completion === '100' ? '#10b981' : okr.completion === '90' ? '#3b82f6' : okr.completion === '80' ? '#f59e0b' : '#ef4444'}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${okr.completion}%</span>
+                                        <span style="color: #718096; font-size: 13px;">${okr.quarter === 'H1' ? 'H1 2026' : okr.quarter === 'H2' ? 'H2 2026' : okr.quarter + ' 2026'}</span>
+                                    </div>
+                                    ${okr.target ? `<div style="color: #4b5563; font-size: 14px; margin-bottom: 4px;"><strong>Target:</strong> ${okr.target}</div>` : ''}
+                                    ${okr.actual ? `<div style="color: #4b5563; font-size: 14px; margin-bottom: 8px;"><strong>Actual:</strong> ${okr.actual}</div>` : ''}
+                                </div>
+                            `).join('')}
+                            <button onclick="switchView('okr-manager')" style="background: #2D4C33; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">View in OKR Manager</button>
                         </div>
                     `;
                 } else {
-                    okrDiv.textContent = 'OKR not found (may have been deleted)';
+                    okrDiv.textContent = 'Linked OKRs not found (may have been deleted)';
                 }
             } else {
                 okrDiv.textContent = 'No OKR alignment specified';
@@ -2883,10 +2907,19 @@ Dashboard: https://..."></textarea>
                 impacts.push(`<strong>Skills Demonstrated:</strong> ${project.skills.join(', ')}`);
             }
 
-            if (project.okrId) {
-                const okr = okrs.find(o => o.id === project.okrId);
-                if (okr) {
-                    impacts.push(`<strong>Strategic Contribution:</strong> Directly supports ${okr.name}`);
+            // Handle both old single okrId and new okrIds array
+            let linkedOKRIds = [];
+            if (project.okrIds && Array.isArray(project.okrIds)) {
+                linkedOKRIds = project.okrIds;
+            } else if (project.okrId) {
+                linkedOKRIds = [project.okrId];
+            }
+
+            if (linkedOKRIds.length > 0) {
+                const linkedOKRs = linkedOKRIds.map(id => okrs.find(o => o.id === id)).filter(o => o);
+                if (linkedOKRs.length > 0) {
+                    const okrNames = linkedOKRs.map(o => o.name).join(', ');
+                    impacts.push(`<strong>Strategic Contribution:</strong> Directly supports ${linkedOKRs.length} OKR${linkedOKRs.length > 1 ? 's' : ''}: ${okrNames}`);
                 }
             }
 
@@ -3148,16 +3181,25 @@ Dashboard: https://..."></textarea>
             document.getElementById('project-modal').classList.add('active');
         }
 
-        // Populate OKR dropdown
-        function populateOKRDropdown(selectedOKRId = null) {
-            const select = document.getElementById('project-okr');
-            let html = '<option value="">No OKR linked</option>';
+        // Populate OKR checkboxes
+        function populateOKRDropdown(selectedOKRIds = []) {
+            const container = document.getElementById('project-okr-checkboxes');
 
-            // Group OKRs by quarter
-            const byQuarter = {};
+            if (okrs.length === 0) {
+                container.innerHTML = '<p style="color: #718096; text-align: center;">No OKRs created yet. Create OKRs in the OKR Manager first.</p>';
+                return;
+            }
+
+            // Ensure selectedOKRIds is an array
+            if (!Array.isArray(selectedOKRIds)) {
+                selectedOKRIds = selectedOKRIds ? [selectedOKRIds] : [];
+            }
+
+            // Group OKRs by period
+            const byPeriod = {};
             okrs.forEach(okr => {
-                if (!byQuarter[okr.quarter]) byQuarter[okr.quarter] = [];
-                byQuarter[okr.quarter].push(okr);
+                if (!byPeriod[okr.quarter]) byPeriod[okr.quarter] = [];
+                byPeriod[okr.quarter].push(okr);
             });
 
             const periodLabels = {
@@ -3169,18 +3211,37 @@ Dashboard: https://..."></textarea>
                 'Q4': 'Q4 2026'
             };
 
+            let html = '';
             ['H1', 'H2', 'Q1', 'Q2', 'Q3', 'Q4'].forEach(period => {
-                if (byQuarter[period]) {
-                    html += `<optgroup label="${periodLabels[period]}">`;
-                    byQuarter[period].forEach(okr => {
-                        const selected = selectedOKRId === okr.id ? 'selected' : '';
-                        html += `<option value="${okr.id}" ${selected}>${okr.name}</option>`;
-                    });
-                    html += `</optgroup>`;
+                if (byPeriod[period]) {
+                    html += `
+                        <div style="margin-bottom: 20px;">
+                            <div style="font-size: 14px; font-weight: 700; color: #2D4C33; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 2px solid #D1F470;">
+                                ${periodLabels[period]}
+                            </div>
+                            <div style="display: grid; gap: 8px;">
+                                ${byPeriod[period].map(okr => {
+                                    const isChecked = selectedOKRIds.includes(okr.id);
+                                    const completionColor = okr.completion === '100' ? '#10b981' :
+                                                          okr.completion === '90' ? '#3b82f6' :
+                                                          okr.completion === '80' ? '#f59e0b' : '#ef4444';
+                                    return `
+                                        <label style="display: flex; align-items: start; padding: 10px; background: white; border-radius: 6px; cursor: pointer; border: 2px solid ${isChecked ? '#2D4C33' : '#e2e8f0'}; transition: all 0.2s;" onmouseover="this.style.borderColor='#2D4C33'" onmouseout="this.style.borderColor='${isChecked ? '#2D4C33' : '#e2e8f0'}'">
+                                            <input type="checkbox" name="project-okr-checkbox" value="${okr.id}" ${isChecked ? 'checked' : ''} style="margin-top: 2px; margin-right: 10px; cursor: pointer;">
+                                            <div style="flex: 1;">
+                                                <div style="font-size: 14px; color: #11110D; font-weight: 500; margin-bottom: 4px;">${okr.name}</div>
+                                                <span style="background: ${completionColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">${okr.completion}%</span>
+                                            </div>
+                                        </label>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
                 }
             });
 
-            select.innerHTML = html;
+            container.innerHTML = html;
         }
 
         // Open edit modal
@@ -3206,8 +3267,14 @@ Dashboard: https://..."></textarea>
             document.getElementById('project-risks').value = project.risks || '';
             document.getElementById('project-links').value = project.links || '';
 
-            // Populate OKR dropdown with selected OKR
-            populateOKRDropdown(project.okrId || null);
+            // Populate OKR checkboxes with selected OKRs
+            // Handle both old single okrId and new okrIds array for backward compatibility
+            let selectedOKRIds = project.okrIds || [];
+            if (project.okrId && !project.okrIds) {
+                // Migrate old single okrId to array
+                selectedOKRIds = [project.okrId];
+            }
+            populateOKRDropdown(selectedOKRIds);
 
             // Set skills checkboxes
             document.querySelectorAll('input[name="skill"]').forEach(cb => {
@@ -3230,6 +3297,10 @@ Dashboard: https://..."></textarea>
             const skills = Array.from(document.querySelectorAll('input[name="skill"]:checked'))
                 .map(cb => cb.value);
 
+            // Collect selected OKRs
+            const selectedOKRIds = Array.from(document.querySelectorAll('input[name="project-okr-checkbox"]:checked'))
+                .map(cb => cb.value);
+
             const projectData = {
                 name: document.getElementById('project-name').value,
                 status: document.getElementById('project-status').value,
@@ -3245,7 +3316,7 @@ Dashboard: https://..."></textarea>
                 impact: document.getElementById('project-impact').value,
                 risks: document.getElementById('project-risks').value,
                 links: document.getElementById('project-links').value,
-                okrId: document.getElementById('project-okr').value,
+                okrIds: selectedOKRIds,
                 skills: skills
             };
 
@@ -3501,7 +3572,10 @@ Dashboard: https://..."></textarea>
             // Count unique OKRs
             const uniqueOKRs = new Set();
             projects.forEach(p => {
-                if (p.okrId) {
+                // Handle both old single okrId and new okrIds array
+                if (p.okrIds && Array.isArray(p.okrIds)) {
+                    p.okrIds.forEach(id => uniqueOKRs.add(id));
+                } else if (p.okrId) {
                     uniqueOKRs.add(p.okrId);
                 }
             });
@@ -3547,10 +3621,21 @@ Dashboard: https://..."></textarea>
                         </div>
                         <p style="color: #64748b; margin-bottom: 12px; font-size: 15px;"><strong>Impact:</strong> ${project.tldr || project.executiveSummary}</p>
                         ${project.impact ? `<p style="color: #11110D; font-size: 14px; line-height: 1.6;"><strong>Details:</strong> ${project.impact.substring(0, 300)}${project.impact.length > 300 ? '...' : ''}</p>` : ''}
-                        ${project.okrId ? (() => {
-                            const okr = okrs.find(o => o.id === project.okrId);
-                            return okr ? `<p style="color: #2D4C33; margin-top: 12px; font-size: 13px; font-weight: 600;"><strong>OKR:</strong> ${okr.name} (${okr.completion}%)</p>` : '';
-                        })() : ''}
+                        ${(() => {
+                            let linkedOKRIds = [];
+                            if (project.okrIds && Array.isArray(project.okrIds)) {
+                                linkedOKRIds = project.okrIds;
+                            } else if (project.okrId) {
+                                linkedOKRIds = [project.okrId];
+                            }
+                            if (linkedOKRIds.length > 0) {
+                                const linkedOKRs = linkedOKRIds.map(id => okrs.find(o => o.id === id)).filter(o => o);
+                                if (linkedOKRs.length > 0) {
+                                    return `<p style="color: #2D4C33; margin-top: 12px; font-size: 13px; font-weight: 600;"><strong>OKRs:</strong> ${linkedOKRs.map(o => `${o.name} (${o.completion}%)`).join(', ')}</p>`;
+                                }
+                            }
+                            return '';
+                        })()}
                     </div>
                 `;
             });
@@ -3605,19 +3690,27 @@ Dashboard: https://..."></textarea>
         function renderOKRContributions() {
             const okrDiv = document.getElementById('okr-contributions');
 
-            // Group projects by OKR
+            // Group projects by OKR (a project can appear under multiple OKRs)
             const okrMap = {};
             projects.forEach(p => {
-                if (p.okrId) {
-                    if (!okrMap[p.okrId]) {
-                        okrMap[p.okrId] = [];
+                // Handle both old single okrId and new okrIds array
+                let linkedOKRIds = [];
+                if (p.okrIds && Array.isArray(p.okrIds)) {
+                    linkedOKRIds = p.okrIds;
+                } else if (p.okrId) {
+                    linkedOKRIds = [p.okrId];
+                }
+
+                linkedOKRIds.forEach(okrId => {
+                    if (!okrMap[okrId]) {
+                        okrMap[okrId] = [];
                     }
-                    okrMap[p.okrId].push({
+                    okrMap[okrId].push({
                         name: p.name,
                         status: p.status,
                         impact: p.tldr || p.executiveSummary
                     });
-                }
+                });
             });
 
             const okrEntries = Object.entries(okrMap);
@@ -3705,11 +3798,21 @@ Dashboard: https://..."></textarea>
             const uniqueOKRIds = new Set();
             const okrDetails = [];
             filteredProjects.forEach(p => {
-                if (p.okrId && !uniqueOKRIds.has(p.okrId)) {
-                    uniqueOKRIds.add(p.okrId);
-                    const okr = okrs.find(o => o.id === p.okrId);
-                    if (okr) okrDetails.push(okr);
+                // Handle both old single okrId and new okrIds array
+                let linkedOKRIds = [];
+                if (p.okrIds && Array.isArray(p.okrIds)) {
+                    linkedOKRIds = p.okrIds;
+                } else if (p.okrId) {
+                    linkedOKRIds = [p.okrId];
                 }
+
+                linkedOKRIds.forEach(okrId => {
+                    if (!uniqueOKRIds.has(okrId)) {
+                        uniqueOKRIds.add(okrId);
+                        const okr = okrs.find(o => o.id === okrId);
+                        if (okr) okrDetails.push(okr);
+                    }
+                });
             });
 
             // Collect skills
@@ -3737,9 +3840,20 @@ Dashboard: https://..."></textarea>
             highlights.forEach((p, i) => {
                 content += `${i + 1}. ${p.name}\n`;
                 content += `   ${p.tldr || p.executiveSummary}\n`;
-                if (p.okrId) {
-                    const okr = okrs.find(o => o.id === p.okrId);
-                    if (okr) content += `   Supports: ${okr.name} (${okr.completion}% complete)\n`;
+
+                // Handle both old single okrId and new okrIds array
+                let linkedOKRIds = [];
+                if (p.okrIds && Array.isArray(p.okrIds)) {
+                    linkedOKRIds = p.okrIds;
+                } else if (p.okrId) {
+                    linkedOKRIds = [p.okrId];
+                }
+
+                if (linkedOKRIds.length > 0) {
+                    const linkedOKRs = linkedOKRIds.map(id => okrs.find(o => o.id === id)).filter(o => o);
+                    if (linkedOKRs.length > 0) {
+                        content += `   Supports: ${linkedOKRs.map(o => `${o.name} (${o.completion}% complete)`).join(', ')}\n`;
+                    }
                 }
                 content += `\n`;
             });
@@ -3752,7 +3866,13 @@ Dashboard: https://..."></textarea>
 
             content += `STRATEGIC CONTRIBUTIONS:\n`;
             okrDetails.forEach(okr => {
-                const relatedProjects = filteredProjects.filter(p => p.okrId === okr.id);
+                const relatedProjects = filteredProjects.filter(p => {
+                    // Handle both old single okrId and new okrIds array
+                    if (p.okrIds && Array.isArray(p.okrIds)) {
+                        return p.okrIds.includes(okr.id);
+                    }
+                    return p.okrId === okr.id;
+                });
                 content += `• ${okr.name} (${okr.completion}% complete)\n`;
                 content += `  Delivered ${relatedProjects.length} initiative${relatedProjects.length > 1 ? 's' : ''} supporting this objective\n`;
             });
@@ -4061,9 +4181,20 @@ Dashboard: https://..."></textarea>
                 const project = projects.find(p => p.id === projectId);
                 if (project) {
                     projectContext = `\n\nProject Context:\n- Project: ${project.name}\n- Status: ${project.status}\n- Overview: ${project.tldr || project.executiveSummary}`;
-                    if (project.okrId) {
-                        const okr = okrs.find(o => o.id === project.okrId);
-                        if (okr) projectContext += `\n- OKR: ${okr.name} (${okr.completion}% complete)`;
+
+                    // Handle both old single okrId and new okrIds array
+                    let linkedOKRIds = [];
+                    if (project.okrIds && Array.isArray(project.okrIds)) {
+                        linkedOKRIds = project.okrIds;
+                    } else if (project.okrId) {
+                        linkedOKRIds = [project.okrId];
+                    }
+
+                    if (linkedOKRIds.length > 0) {
+                        const linkedOKRs = linkedOKRIds.map(id => okrs.find(o => o.id === id)).filter(o => o);
+                        if (linkedOKRs.length > 0) {
+                            projectContext += `\n- OKRs: ${linkedOKRs.map(o => `${o.name} (${o.completion}% complete)`).join(', ')}`;
+                        }
                     }
                 }
             }
