@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Portfolio Tracker - Innovation Day Submission</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        .slide {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px;
+            page-break-after: always;
+        }
+        .slide:nth-child(1) { background: linear-gradient(135deg, #2D4C33 0%, #1f3625 100%); }
+        .slide:nth-child(2) { background: linear-gradient(135deg, #1f3625 0%, #0f1f14 100%); }
+
+        .slide-header {
+            font-size: 18px;
+            font-weight: 600;
+            opacity: 0.7;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .slide-title {
+            font-size: 64px;
+            font-weight: 800;
+            margin-bottom: 32px;
+            line-height: 1.1;
+            color: #D1F470;
+        }
+        .slide-subtitle {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 48px;
+            opacity: 0.95;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-top: 40px;
+        }
+
+        .content-box {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 16px;
+            border: 2px solid rgba(209,244,112,0.3);
+        }
+
+        .box-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #D1F470;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .box-content {
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .box-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .box-content li {
+            padding: 12px 0;
+            padding-left: 32px;
+            position: relative;
+        }
+
+        .box-content li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #D1F470;
+            font-weight: bold;
+        }
+
+        .highlight-stat {
+            font-size: 72px;
+            font-weight: 900;
+            color: #D1F470;
+            margin: 24px 0 16px 0;
+            line-height: 1;
+        }
+
+        .highlight-label {
+            font-size: 24px;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        .stat-row {
+            display: flex;
+            gap: 40px;
+            margin: 32px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .stat-number {
+            font-size: 56px;
+            font-weight: 900;
+            color: #D1F470;
+            line-height: 1;
+        }
+
+        .stat-desc {
+            font-size: 18px;
+            opacity: 0.85;
+            margin-top: 8px;
+        }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 2px solid rgba(209,244,112,0.3);
+            font-size: 16px;
+            opacity: 0.7;
+        }
+
+        .quote-box {
+            background: rgba(209,244,112,0.15);
+            border-left: 6px solid #D1F470;
+            padding: 32px;
+            margin: 32px 0;
+            border-radius: 8px;
+        }
+
+        .quote-text {
+            font-size: 28px;
+            font-weight: 600;
+            font-style: italic;
+            color: #D1F470;
+            margin-bottom: 16px;
+        }
+
+        .quote-author {
+            font-size: 18px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 1024px) {
+            .slide { padding: 40px; }
+            .slide-title { font-size: 48px; }
+            .content-grid { grid-template-columns: 1fr; gap: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SLIDE 1: PROBLEM & SOLUTION -->
+<div class="slide">
+    <div class="slide-header">Innovation Day 2026 • Karyn Thompson</div>
+    <div class="slide-title">Project Portfolio Tracker</div>
+    <div class="slide-subtitle">Never Scramble for Updates or Accomplishments Again</div>
+
+    <div class="content-grid">
+        <div class="content-box">
+            <div class="box-title">🎯 The Goal</div>
+            <div class="box-content">
+                <p style="margin-bottom: 24px; font-size: 20px; font-weight: 600;">Make portfolio visibility effortless</p>
+                <ul>
+                    <li>Track all projects, OKRs, and impact in one place</li>
+                    <li>Never scramble for status updates or accomplishments</li>
+                    <li>Give manager at-a-glance view of everything</li>
+                    <li>Highlight blockers, needs, and successes</li>
+                    <li>Performance review ready at any moment</li>
+                </ul>
+                <div class="highlight-stat">1-2 hrs</div>
+                <div class="highlight-label">per week on manual tracking & updates</div>
+            </div>
+        </div>
+
+        <div class="content-box">
+            <div class="box-title">✨ The Solution</div>
+            <div class="box-content">
+                <p style="margin-bottom: 24px; font-size: 20px; font-weight: 600;">Personal operating system for work</p>
+                <ul>
+                    <li>Portfolio dashboard with real-time status</li>
+                    <li>OKR Manager with project alignment</li>
+                    <li>Brag Book & Career Growth tracking</li>
+                    <li>Digital Twin (AI context for quick updates)</li>
+                    <li>Meeting Notes linked to projects</li>
+                </ul>
+                <div class="highlight-stat">100%</div>
+                <div class="highlight-label">visibility into portfolio & impact</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>Live Tool:</strong> <a href="https://zendesk-karyn-thompson.github.io/Karyns-Project-Tracker/" target="_blank" style="color: #D1F470; text-decoration: underline;">zendesk-karyn-thompson.github.io/Karyns-Project-Tracker</a>
+    </div>
+</div>
+
+<!-- SLIDE 2: IMPACT & LEARNING -->
+<div class="slide">
+    <div class="slide-header">Innovation Day 2026 • Karyn Thompson</div>
+    <div class="slide-title">Impact & Learning</div>
+
+    <div style="margin-top: 40px;">
+        <div class="box-title" style="margin-bottom: 32px;">📊 Efficiency Gains</div>
+
+        <div class="stat-row">
+            <div class="stat-item">
+                <div class="stat-number">1-2 hrs</div>
+                <div class="stat-desc">saved per week<br>(status updates & tracking)</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">Instant</div>
+                <div class="stat-desc">performance review prep<br>always ready</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">100%</div>
+                <div class="stat-desc">portfolio visibility<br>in one place</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="quote-box">
+        <div class="quote-text">"Building a personal operating system that tracks not just what I do, but how I grow"</div>
+        <div class="quote-author">My biggest learning from this project</div>
+    </div>
+
+    <div class="content-box" style="margin-top: 32px;">
+        <div class="box-title">🚀 What I Learned</div>
+        <div class="box-content">
+            <ul>
+                <li><strong>Track growth, not just tasks</strong> — Career development needs the same rigor as project management</li>
+                <li><strong>Integrated system > scattered tools</strong> — Everything connected means better insights</li>
+                <li><strong>Build for future you</strong> — Your 6-month-ago self can't remember details; capture them now</li>
+                <li><strong>Visibility drives impact</strong> — When you can see your portfolio, you make better strategic decisions</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="margin-top: 48px; display: flex; gap: 40px; align-items: center;">
+        <div style="flex: 1;">
+            <div class="box-title" style="margin-bottom: 16px;">🎁 Business Value</div>
+            <div style="font-size: 18px; line-height: 1.8;">
+                ✓ 1-2 hours saved per week<br>
+                ✓ Manager visibility: blockers, needs, successes<br>
+                ✓ Instant performance review readiness<br>
+                ✓ Better project prioritization decisions<br>
+                ✓ Career growth tracking & skill development<br>
+                ✓ Template for other team members
+            </div>
+        </div>
+        <div style="flex: 1; text-align: right;">
+            <div style="font-size: 16px; opacity: 0.7; margin-bottom: 12px;">READY TO USE</div>
+            <div style="font-size: 48px; font-weight: 900; color: #D1F470;">Today</div>
+            <div style="font-size: 20px; opacity: 0.9;">Zero infrastructure cost</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <strong>Tool:</strong> <a href="https://zendesk-karyn-thompson.github.io/Karyns-Project-Tracker/" target="_blank" style="color: #D1F470; text-decoration: underline;">zendesk-karyn-thompson.github.io/Karyns-Project-Tracker</a> • <strong>Submitted by:</strong> Karyn Thompson • <strong>Date:</strong> March 27, 2026
+    </div>
+</div>
+
+<script>
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+            window.scrollBy({ top: window.innerHeight, behavior: 'smooth' });
+        } else if (e.key === 'ArrowLeft') {
+            window.scrollBy({ top: -window.innerHeight, behavior: 'smooth' });
+        }
+    });
+</script>
+
+</body>
+</html>
