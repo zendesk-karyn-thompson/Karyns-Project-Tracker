@@ -606,6 +606,12 @@
             font-weight: 600;
         }
 
+        .category-filter-btn.active[onclick*="completed"] {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #10b981;
+        }
+
         .category-section {
             margin-bottom: 48px;
         }
@@ -1268,6 +1274,7 @@
                 <button class="category-filter-btn" onclick="filterByCategory('partner')">Partner & Tech Alliance</button>
                 <button class="category-filter-btn" onclick="filterByCategory('mql')">MQL & Onboarding</button>
                 <button class="category-filter-btn" onclick="filterByCategory('governance')">Governance & Growth</button>
+                <button class="category-filter-btn" onclick="filterByCategory('completed')" style="border-color: #10b981; color: #10b981;">✅ Completed</button>
             </div>
 
             <div id="projects-container">
@@ -2273,7 +2280,9 @@ Dashboard: https://..."></textarea>
                 return;
             }
 
-            if (currentCategoryFilter === 'all') {
+            if (currentCategoryFilter === 'completed') {
+                renderCompletedProjects(container);
+            } else if (currentCategoryFilter === 'all') {
                 renderByCategories(container);
             } else {
                 renderFilteredProjects(container, currentCategoryFilter);
@@ -2289,7 +2298,8 @@ Dashboard: https://..."></textarea>
             let html = '';
 
             Object.keys(categories).forEach(categoryKey => {
-                const categoryProjects = projects.filter(p => p.category === categoryKey);
+                // Exclude completed projects from default view
+                const categoryProjects = projects.filter(p => p.category === categoryKey && p.status !== 'completed');
 
                 if (categoryProjects.length > 0) {
                     html += `
@@ -2351,7 +2361,8 @@ Dashboard: https://..."></textarea>
 
         // Render filtered projects
         function renderFilteredProjects(container, categoryKey) {
-            const categoryProjects = projects.filter(p => p.category === categoryKey);
+            // Exclude completed projects from category view
+            const categoryProjects = projects.filter(p => p.category === categoryKey && p.status !== 'completed');
 
             container.innerHTML = `
                 <div class="category-section">
@@ -2368,6 +2379,67 @@ Dashboard: https://..."></textarea>
                     </div>
                 </div>
             `;
+        }
+
+        // Render completed projects
+        function renderCompletedProjects(container) {
+            const completedProjects = projects.filter(p => p.status === 'completed');
+
+            if (completedProjects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No completed projects yet</h3>
+                        <p>Projects marked as "Completed" will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group completed projects by category
+            let html = '<div style="margin-bottom: 32px;">';
+            html += `
+                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 16px; padding: 32px; margin-bottom: 32px; text-align: center;">
+                    <h2 style="font-size: 32px; color: white; margin-bottom: 12px;">✅ Completed Projects</h2>
+                    <p style="font-size: 18px; color: rgba(255,255,255,0.9);">Archive of ${completedProjects.length} successfully completed project${completedProjects.length > 1 ? 's' : ''}</p>
+                </div>
+            `;
+
+            Object.keys(categories).forEach(categoryKey => {
+                const categoryCompleted = completedProjects.filter(p => p.category === categoryKey);
+
+                if (categoryCompleted.length > 0) {
+                    html += `
+                        <div class="category-section" style="margin-bottom: 48px;">
+                            <div class="category-header ${categoryKey}">
+                                <h2>${getCategoryIcon(categoryKey)} ${categories[categoryKey]}</h2>
+                                <span class="category-count">${categoryCompleted.length} completed</span>
+                            </div>
+                            <div class="projects-grid">
+                                ${renderProjectCards(categoryCompleted)}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            // Handle uncategorized completed projects
+            const uncategorized = completedProjects.filter(p => !p.category);
+            if (uncategorized.length > 0) {
+                html += `
+                    <div class="category-section" style="margin-bottom: 48px;">
+                        <div class="category-header" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);">
+                            <h2>📁 Uncategorized</h2>
+                            <span class="category-count">${uncategorized.length} completed</span>
+                        </div>
+                        <div class="projects-grid">
+                            ${renderProjectCards(uncategorized)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
         }
 
         // ===== OKR MANAGEMENT FUNCTIONS =====
@@ -2853,7 +2925,8 @@ Dashboard: https://..."></textarea>
 
         // Update priority alert
         function updatePriorityAlert() {
-            const needsPrioritization = projects.filter(p => p.needsPrioritization);
+            // Only show non-completed projects that need prioritization
+            const needsPrioritization = projects.filter(p => p.needsPrioritization && p.status !== 'completed');
             const alertBox = document.getElementById('priority-alert');
             const alertContent = document.getElementById('priority-alert-content');
 
