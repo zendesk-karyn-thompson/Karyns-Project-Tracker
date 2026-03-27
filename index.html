@@ -1424,9 +1424,11 @@
             </div>
 
             <div class="form-group" style="margin-bottom: 32px; max-width: 300px;">
-                <label for="okr-quarter-filter">Filter by Quarter</label>
+                <label for="okr-quarter-filter">Filter by Period</label>
                 <select id="okr-quarter-filter" onchange="renderOKRs()">
-                    <option value="all">All Quarters</option>
+                    <option value="all">All Periods</option>
+                    <option value="H1">H1 (First Half)</option>
+                    <option value="H2">H2 (Second Half)</option>
                     <option value="Q1">Q1</option>
                     <option value="Q2">Q2</option>
                     <option value="Q3">Q3</option>
@@ -2072,9 +2074,11 @@ Dashboard: https://..."></textarea>
 
             <div class="modal-body">
                 <div class="form-group">
-                    <label for="okr-quarter">Quarter *</label>
+                    <label for="okr-quarter">Period *</label>
                     <select id="okr-quarter" required>
-                        <option value="">Select Quarter</option>
+                        <option value="">Select Period</option>
+                        <option value="H1">H1 (First Half)</option>
+                        <option value="H2">H2 (Second Half)</option>
                         <option value="Q1">Q1</option>
                         <option value="Q2">Q2</option>
                         <option value="Q3">Q3</option>
@@ -2505,21 +2509,28 @@ Dashboard: https://..."></textarea>
                 return;
             }
 
-            // Group by quarter
-            const byQuarter = {};
+            // Group by period
+            const byPeriod = {};
             filteredOKRs.forEach(okr => {
-                if (!byQuarter[okr.quarter]) byQuarter[okr.quarter] = [];
-                byQuarter[okr.quarter].push(okr);
+                if (!byPeriod[okr.quarter]) byPeriod[okr.quarter] = [];
+                byPeriod[okr.quarter].push(okr);
             });
 
+            // Helper function to get period label
+            const getPeriodLabel = (period) => {
+                if (period === 'H1') return 'H1 2026 (First Half)';
+                if (period === 'H2') return 'H2 2026 (Second Half)';
+                return `${period} 2026`;
+            };
+
             let html = '';
-            ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
-                if (byQuarter[quarter]) {
+            ['H1', 'H2', 'Q1', 'Q2', 'Q3', 'Q4'].forEach(period => {
+                if (byPeriod[period]) {
                     html += `
                         <div style="margin-bottom: 40px;">
-                            <h3 style="font-size: 20px; color: #2D4C33; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #D1F470;">${quarter} 2026</h3>
+                            <h3 style="font-size: 20px; color: #2D4C33; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #D1F470;">${getPeriodLabel(period)}</h3>
                             <div style="display: grid; gap: 20px;">
-                                ${byQuarter[quarter].map(okr => {
+                                ${byPeriod[period].map(okr => {
                                     const linkedProjects = projects.filter(p => p.okrId === okr.id);
                                     const completionColor = okr.completion === '100' ? '#10b981' :
                                                           okr.completion === '90' ? '#3b82f6' :
@@ -2797,7 +2808,7 @@ Dashboard: https://..."></textarea>
                             <div style="font-size: 16px; font-weight: 600; color: #11110D; margin-bottom: 8px;">${okr.name}</div>
                             <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px;">
                                 <span style="background: ${okr.completion === '100' ? '#10b981' : okr.completion === '90' ? '#3b82f6' : okr.completion === '80' ? '#f59e0b' : '#ef4444'}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${okr.completion}%</span>
-                                <span style="color: #718096; font-size: 13px;">${okr.quarter} 2026</span>
+                                <span style="color: #718096; font-size: 13px;">${okr.quarter === 'H1' ? 'H1 2026' : okr.quarter === 'H2' ? 'H2 2026' : okr.quarter + ' 2026'}</span>
                             </div>
                             ${okr.target ? `<div style="color: #4b5563; font-size: 14px; margin-bottom: 4px;"><strong>Target:</strong> ${okr.target}</div>` : ''}
                             ${okr.actual ? `<div style="color: #4b5563; font-size: 14px;"><strong>Actual:</strong> ${okr.actual}</div>` : ''}
@@ -3149,10 +3160,19 @@ Dashboard: https://..."></textarea>
                 byQuarter[okr.quarter].push(okr);
             });
 
-            ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
-                if (byQuarter[quarter]) {
-                    html += `<optgroup label="${quarter} 2026">`;
-                    byQuarter[quarter].forEach(okr => {
+            const periodLabels = {
+                'H1': 'H1 2026 (First Half)',
+                'H2': 'H2 2026 (Second Half)',
+                'Q1': 'Q1 2026',
+                'Q2': 'Q2 2026',
+                'Q3': 'Q3 2026',
+                'Q4': 'Q4 2026'
+            };
+
+            ['H1', 'H2', 'Q1', 'Q2', 'Q3', 'Q4'].forEach(period => {
+                if (byQuarter[period]) {
+                    html += `<optgroup label="${periodLabels[period]}">`;
+                    byQuarter[period].forEach(okr => {
                         const selected = selectedOKRId === okr.id ? 'selected' : '';
                         html += `<option value="${okr.id}" ${selected}>${okr.name}</option>`;
                     });
@@ -3628,7 +3648,7 @@ Dashboard: https://..."></textarea>
                                 <h3 style="font-size: 16px; color: #2D4C33; font-weight: 700; margin-bottom: 8px;">${okr.name}</h3>
                                 <div style="display: flex; gap: 12px; align-items: center;">
                                     <span style="background: ${completionColor}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${okr.completion}%</span>
-                                    <span style="color: #718096; font-size: 13px;">${okr.quarter} 2026</span>
+                                    <span style="color: #718096; font-size: 13px;">${okr.quarter === 'H1' ? 'H1 2026' : okr.quarter === 'H2' ? 'H2 2026' : okr.quarter + ' 2026'}</span>
                                 </div>
                             </div>
                             <button onclick="switchView('okr-manager')" style="background: #2D4C33; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;">View OKR</button>
