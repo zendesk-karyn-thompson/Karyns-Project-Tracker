@@ -2028,31 +2028,13 @@ Dashboard: https://..."></textarea>
 
                 <div class="form-group">
                     <label>Skills Demonstrated (Optional)</label>
-                    <div class="checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="skill" value="Strategic Thinking"> Strategic Thinking
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="skill" value="Cross-functional Leadership"> Cross-functional Leadership
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="skill" value="Executive Communication"> Executive Communication
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="skill" value="Data-Driven Decision Making"> Data-Driven Decision Making
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="skill" value="Process Improvement"> Process Improvement
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="skill" value="Stakeholder Management"> Stakeholder Management
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="skill" value="Project Management"> Project Management
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="skill" value="Innovation"> Innovation
-                        </label>
+                    <small style="color: #718096; display: block; margin-bottom: 8px;">Type a skill and click "Add" to create a tag</small>
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <input type="text" id="project-skill-input" placeholder="e.g., Strategic Thinking, Project Management..." style="flex: 1;">
+                        <button type="button" onclick="addProjectSkill()" style="background: #2D4C33; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; white-space: nowrap;">+ Add</button>
+                    </div>
+                    <div id="project-skills-display" style="display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <span style="color: #718096; font-size: 14px;">No skills added yet</span>
                     </div>
                 </div>
 
@@ -2127,6 +2109,18 @@ Dashboard: https://..."></textarea>
                 <div class="form-group">
                     <label for="okr-notes">Notes, Resources, Key Links</label>
                     <textarea id="okr-notes" rows="3" placeholder="Links to deliverables, reporting, and other resources"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Skills Leveraged (Optional)</label>
+                    <small style="color: #718096; display: block; margin-bottom: 8px;">Type a skill and click "Add" to create a tag</small>
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <input type="text" id="okr-skill-input" placeholder="e.g., Strategic Planning, Data Analysis..." style="flex: 1;">
+                        <button type="button" onclick="addOKRSkill()" style="background: #2D4C33; color: white; padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; white-space: nowrap;">+ Add</button>
+                    </div>
+                    <div id="okr-skills-display" style="display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; padding: 12px; background: #f9fafb; border-radius: 8px; border: 1px solid #e2e8f0;">
+                        <span style="color: #718096; font-size: 14px;">No skills added yet</span>
+                    </div>
                 </div>
 
                 <div class="form-actions">
@@ -2378,6 +2372,115 @@ Dashboard: https://..."></textarea>
 
         // ===== OKR MANAGEMENT FUNCTIONS =====
 
+        // Temporary skill storage
+        let tempOKRSkills = [];
+        let tempProjectSkills = [];
+
+        // Add skill to OKR
+        function addOKRSkill() {
+            const input = document.getElementById('okr-skill-input');
+            const skill = input.value.trim();
+
+            if (!skill) return;
+
+            // Avoid duplicates
+            if (tempOKRSkills.includes(skill)) {
+                alert('This skill has already been added');
+                return;
+            }
+
+            tempOKRSkills.push(skill);
+            input.value = '';
+            renderOKRSkills();
+        }
+
+        // Remove skill from OKR
+        function removeOKRSkill(skill) {
+            tempOKRSkills = tempOKRSkills.filter(s => s !== skill);
+            renderOKRSkills();
+        }
+
+        // Render OKR skills display
+        function renderOKRSkills() {
+            const display = document.getElementById('okr-skills-display');
+
+            if (tempOKRSkills.length === 0) {
+                display.innerHTML = '<span style="color: #718096; font-size: 14px;">No skills added yet</span>';
+                return;
+            }
+
+            display.innerHTML = tempOKRSkills.map(skill => `
+                <span style="background: #D1F470; color: #203524; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    ${skill}
+                    <button onclick="removeOKRSkill('${skill.replace(/'/g, "\\'")}')" style="background: transparent; border: none; color: #203524; cursor: pointer; font-size: 16px; line-height: 1; padding: 0; margin-left: 2px;" title="Remove skill">×</button>
+                </span>
+            `).join('');
+        }
+
+        // Add skill to Project
+        function addProjectSkill() {
+            const input = document.getElementById('project-skill-input');
+            const skill = input.value.trim();
+
+            if (!skill) return;
+
+            // Avoid duplicates
+            if (tempProjectSkills.includes(skill)) {
+                alert('This skill has already been added');
+                return;
+            }
+
+            tempProjectSkills.push(skill);
+            input.value = '';
+            renderProjectSkills();
+        }
+
+        // Remove skill from Project
+        function removeProjectSkill(skill) {
+            tempProjectSkills = tempProjectSkills.filter(s => s !== skill);
+            renderProjectSkills();
+        }
+
+        // Render Project skills display
+        function renderProjectSkills() {
+            const display = document.getElementById('project-skills-display');
+
+            if (tempProjectSkills.length === 0) {
+                display.innerHTML = '<span style="color: #718096; font-size: 14px;">No skills added yet</span>';
+                return;
+            }
+
+            display.innerHTML = tempProjectSkills.map(skill => `
+                <span style="background: #D1F470; color: #203524; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;">
+                    ${skill}
+                    <button onclick="removeProjectSkill('${skill.replace(/'/g, "\\'")}')" style="background: transparent; border: none; color: #203524; cursor: pointer; font-size: 16px; line-height: 1; padding: 0; margin-left: 2px;" title="Remove skill">×</button>
+                </span>
+            `).join('');
+        }
+
+        // Allow Enter key to add skills
+        document.addEventListener('DOMContentLoaded', () => {
+            const okrSkillInput = document.getElementById('okr-skill-input');
+            if (okrSkillInput) {
+                okrSkillInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addOKRSkill();
+                    }
+                });
+            }
+
+            const projectSkillInput = document.getElementById('project-skill-input');
+            if (projectSkillInput) {
+                projectSkillInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addProjectSkill();
+                    }
+                });
+            }
+        });
+
         // Open OKR Modal
         function openOKRModal(okrId = null) {
             currentOKRId = okrId;
@@ -2397,6 +2500,10 @@ Dashboard: https://..."></textarea>
                     document.getElementById('okr-learnings').value = okr.learnings || '';
                     document.getElementById('okr-notes').value = okr.notes || '';
 
+                    // Load skills
+                    tempOKRSkills = okr.skills && Array.isArray(okr.skills) ? [...okr.skills] : [];
+                    renderOKRSkills();
+
                     if (okr.completion === '50') {
                         document.getElementById('reason-group').style.display = 'block';
                     }
@@ -2412,6 +2519,10 @@ Dashboard: https://..."></textarea>
                 document.getElementById('okr-learnings').value = '';
                 document.getElementById('okr-notes').value = '';
                 document.getElementById('reason-group').style.display = 'none';
+
+                // Clear skills
+                tempOKRSkills = [];
+                renderOKRSkills();
             }
 
             modal.style.display = 'flex';
@@ -2444,6 +2555,7 @@ Dashboard: https://..."></textarea>
                 reason: document.getElementById('okr-reason').value,
                 learnings: document.getElementById('okr-learnings').value,
                 notes: document.getElementById('okr-notes').value,
+                skills: [...tempOKRSkills],
                 year: 2026,
                 createdAt: currentOKRId ? okrs.find(o => o.id === currentOKRId).createdAt : new Date().toISOString(),
                 updatedAt: new Date().toISOString()
@@ -3178,6 +3290,11 @@ Dashboard: https://..."></textarea>
             document.getElementById('modal-title').textContent = 'Add New Project';
             document.getElementById('project-form').reset();
             populateOKRDropdown();
+
+            // Clear skills
+            tempProjectSkills = [];
+            renderProjectSkills();
+
             document.getElementById('project-modal').classList.add('active');
         }
 
@@ -3276,10 +3393,9 @@ Dashboard: https://..."></textarea>
             }
             populateOKRDropdown(selectedOKRIds);
 
-            // Set skills checkboxes
-            document.querySelectorAll('input[name="skill"]').forEach(cb => {
-                cb.checked = project.skills && project.skills.includes(cb.value);
-            });
+            // Load skills
+            tempProjectSkills = project.skills && Array.isArray(project.skills) ? [...project.skills] : [];
+            renderProjectSkills();
 
             document.getElementById('project-modal').classList.add('active');
         }
@@ -3293,9 +3409,6 @@ Dashboard: https://..."></textarea>
         // Save project
         function saveProject(event) {
             event.preventDefault();
-
-            const skills = Array.from(document.querySelectorAll('input[name="skill"]:checked'))
-                .map(cb => cb.value);
 
             // Collect selected OKRs
             const selectedOKRIds = Array.from(document.querySelectorAll('input[name="project-okr-checkbox"]:checked'))
@@ -3317,7 +3430,7 @@ Dashboard: https://..."></textarea>
                 risks: document.getElementById('project-risks').value,
                 links: document.getElementById('project-links').value,
                 okrIds: selectedOKRIds,
-                skills: skills
+                skills: [...tempProjectSkills]
             };
 
             if (editingProjectId) {
