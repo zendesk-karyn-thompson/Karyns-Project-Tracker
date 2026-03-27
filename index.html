@@ -1326,6 +1326,14 @@
                     <div class="section-content" id="section-overview"></div>
                 </div>
 
+                <div class="section" id="persona-section" style="display: none;">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <h3>🎯 Persona Assignment & Prioritization</h3>
+                        <span class="toggle">▼</span>
+                    </div>
+                    <div class="section-content" id="section-persona" style="background: #F5F5F2; padding: 20px; border-radius: 8px; border-left: 4px solid #A1D78F;"></div>
+                </div>
+
                 <div class="section">
                     <div class="section-header" onclick="toggleSection(this)">
                         <h3>Communication & Alignment</h3>
@@ -1988,6 +1996,12 @@ Just paste your notes - I'll handle the rest!" style="width: 100%; padding: 12px
                 <div class="form-group">
                     <label for="project-overview">Program Overview *</label>
                     <textarea id="project-overview" required placeholder="Paste your notes here. What is this project? Why does it matter?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="project-persona">🎯 Persona Assignment & Prioritization (Optional)</label>
+                    <textarea id="project-persona" placeholder="For nurture programs: How are personas assigned? What are the business rules? How do we define CX/IT/HR? What about market segments?"></textarea>
+                    <small style="color: #64748b; font-size: 12px; display: block; margin-top: 6px;">Leave blank if not applicable to this project</small>
                 </div>
 
                 <div class="form-group">
@@ -2968,6 +2982,16 @@ Dashboard: https://..."></textarea>
 
             document.getElementById('section-overview').textContent = project.overview || 'No overview provided';
 
+            // Render Persona Assignment (if exists)
+            const personaSection = document.getElementById('persona-section');
+            const personaContent = document.getElementById('section-persona');
+            if (project.personaAssignment) {
+                personaSection.style.display = 'block';
+                personaContent.innerHTML = formatPersonaAssignment(project.personaAssignment);
+            } else {
+                personaSection.style.display = 'none';
+            }
+
             // Render Slack channel
             const slackDiv = document.getElementById('section-slack-channel');
             if (project.slackChannel) {
@@ -3451,6 +3475,7 @@ Dashboard: https://..."></textarea>
             document.getElementById('project-exec-summary').value = project.executiveSummary || '';
             document.getElementById('project-manager-snapshot').value = project.managerSnapshot || '';
             document.getElementById('project-overview').value = project.overview || '';
+            document.getElementById('project-persona').value = project.personaAssignment || '';
             document.getElementById('project-slack-channel').value = project.slackChannel || '';
             document.getElementById('project-communication').value = project.communication || '';
             document.getElementById('project-impact').value = project.impact || '';
@@ -3497,6 +3522,7 @@ Dashboard: https://..."></textarea>
                 executiveSummary: document.getElementById('project-exec-summary').value,
                 managerSnapshot: document.getElementById('project-manager-snapshot').value,
                 overview: document.getElementById('project-overview').value,
+                personaAssignment: document.getElementById('project-persona').value,
                 slackChannel: document.getElementById('project-slack-channel').value,
                 communication: document.getElementById('project-communication').value,
                 impact: document.getElementById('project-impact').value,
@@ -3656,6 +3682,48 @@ Dashboard: https://..."></textarea>
         function formatSkills(skills) {
             if (!skills || skills.length === 0) return 'No skills specified';
             return skills.map(skill => `<span class="badge" style="background: #D1F470; color: #203524;">${skill}</span>`).join(' ');
+        }
+
+        // Format Persona Assignment
+        function formatPersonaAssignment(text) {
+            if (!text) return 'No persona assignment information';
+
+            // Convert text to HTML with proper formatting
+            return text
+                .split('\n')
+                .map(line => {
+                    line = line.trim();
+                    if (!line) return '<br>';
+
+                    // Section headers (all caps or starts with emoji)
+                    if (line === line.toUpperCase() || /^[🎯]/.test(line)) {
+                        return `<h4 style="color: #2D4C33; font-size: 16px; font-weight: 700; margin-top: 20px; margin-bottom: 12px;">${line}</h4>`;
+                    }
+
+                    // Subsection headers (ends with colon)
+                    if (line.endsWith(':') && line.split(' ').length <= 5) {
+                        return `<div style="font-weight: 600; color: #203524; margin-top: 16px; margin-bottom: 8px; font-size: 14px;">${line}</div>`;
+                    }
+
+                    // Bullet points
+                    if (line.startsWith('•') || line.startsWith('-')) {
+                        return `<div style="margin-left: 20px; margin-bottom: 6px; color: #4a5568; line-height: 1.6;">${line}</div>`;
+                    }
+
+                    // Arrow points (important callouts)
+                    if (line.startsWith('→')) {
+                        return `<div style="background: #FEEB7E; padding: 12px 16px; border-radius: 6px; margin: 8px 0; font-weight: 500; color: #203524; border-left: 4px solid #D1F470;">${line}</div>`;
+                    }
+
+                    // Numbered items
+                    if (/^\d+\./.test(line)) {
+                        return `<div style="margin-left: 20px; margin-bottom: 6px; color: #4a5568; line-height: 1.6;">${line}</div>`;
+                    }
+
+                    // Regular text
+                    return `<div style="margin-bottom: 6px; color: #4a5568; line-height: 1.6;">${line}</div>`;
+                })
+                .join('');
         }
 
         // Extract quick links
